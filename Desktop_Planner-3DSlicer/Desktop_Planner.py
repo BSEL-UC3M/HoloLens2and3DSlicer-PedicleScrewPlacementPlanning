@@ -10,10 +10,10 @@ from slicer.util import VTKObservationMixin
 import time
 
 #
-# SpineGuidanceStudyModule
+# Desktop_Planner_Module
 #
 
-class SpineGuidanceStudyModule(ScriptedLoadableModule):
+class Desktop_Planner(ScriptedLoadableModule):
   """Uses ScriptedLoadableModule base class, available at:
   https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
   """
@@ -26,7 +26,7 @@ class SpineGuidanceStudyModule(ScriptedLoadableModule):
     self.parent.contributors = ["Alicia Pose (UC3M) and David Morton (Perk Lab)"]
     self.parent.helpText = """
         This module facilitates simulated needle placement in the context of previously scanned images or volumes.
-        See more information in <a href="https://github.com/PerkLab/SpineGuidance">module documentation</a>.
+        See more information in <a href="https://github.com/PerkLab/Desktop_Planner">module documentation</a>.
         """
     # TODO: replace with organization, grant and thanks
     self.parent.acknowledgementText = """
@@ -36,10 +36,10 @@ class SpineGuidanceStudyModule(ScriptedLoadableModule):
 
 
 #
-# SpineGuidanceStudyModuleWidget
+# Desktop_PlannerModuleWidget
 #
 
-class SpineGuidanceStudyModuleWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
+class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
   LAYOUT_DUAL3D = 101
 
   def __init__(self, parent=None):
@@ -61,7 +61,7 @@ class SpineGuidanceStudyModuleWidget(ScriptedLoadableModuleWidget, VTKObservatio
 
     # Load widget from .ui file (created by Qt Designer).
     # Additional widgets can be instantiated manually and added to self.layout.
-    uiWidget = slicer.util.loadUI(self.resourcePath('UI/SpineGuidanceStudyModule.ui'))
+    uiWidget = slicer.util.loadUI(self.resourcePath('UI/Desktop_Planner.ui'))
     self.layout.addWidget(uiWidget)
     self.ui = slicer.util.childWidgetVariables(uiWidget)
 
@@ -72,7 +72,7 @@ class SpineGuidanceStudyModuleWidget(ScriptedLoadableModuleWidget, VTKObservatio
 
     # Create logic class. Logic implements all computations that should be possible to run
     # in batch mode, without a graphical user interface.
-    self.logic = SpineGuidanceStudyModuleLogic()
+    self.logic = Desktop_PlannerLogic()
     self.logic.setupScene()
 
     self.setupCustomLayout()
@@ -472,10 +472,10 @@ class SpineGuidanceStudyModuleWidget(ScriptedLoadableModuleWidget, VTKObservatio
 
 
 #
-# SpineGuidanceStudyModuleLogic
+# Desktop_PlannerLogic
 #
 
-class SpineGuidanceStudyModuleLogic(ScriptedLoadableModuleLogic):
+class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
   CURRENT_US_VOLUME = "CurrentUsVolume"
   MOTION_MARGIN = 100  # Allow needle to go outside image volume by this many mm
   STEP_SIZE_TRANSLATION = 1  # Translation single click in mm
@@ -489,7 +489,7 @@ class SpineGuidanceStudyModuleLogic(ScriptedLoadableModuleLogic):
   ROTATE_R = "RotateR"
   ROTATE_S = "RotateS"
 
-  RESULTS_SAVE_DIRECTORY_SETTING = 'SpineGuidance/ResultsSaveDirectory'
+  RESULTS_SAVE_DIRECTORY_SETTING = 'Desktop_Planner/ResultsSaveDirectory'
   USER_ID = "UserID"
   PARTICIPANT_ID = "ParticipantID"
   screwNumber = 0
@@ -731,10 +731,10 @@ class SpineGuidanceStudyModuleLogic(ScriptedLoadableModuleLogic):
 
 
 #
-# SpineGuidanceStudyModuleTest
+# Desktop_PlannerTest
 #
 
-class SpineGuidanceStudyModuleTest(ScriptedLoadableModuleTest):
+class Desktop_PlannerTest(ScriptedLoadableModuleTest):
   """
   This is the test case for your scripted module.
   Uses ScriptedLoadableModuleTest base class, available at:
@@ -750,9 +750,9 @@ class SpineGuidanceStudyModuleTest(ScriptedLoadableModuleTest):
     """Run as few or as many tests as needed here.
     """
     self.setUp()
-    self.test_SpineGuidanceStudyModule1()
+    self.test_Desktop_PlannerModule1()
 
-  def test_SpineGuidanceStudyModule1(self):
+  def test_Desktop_PlannerModule1(self):
     """ Ideally you should have several levels of tests.  At the lowest level
     tests should exercise the functionality of the logic with different inputs
     (both valid and invalid).  At higher levels your tests should emulate the
@@ -770,7 +770,7 @@ class SpineGuidanceStudyModuleTest(ScriptedLoadableModuleTest):
 
     import SampleData
     registerSampleData()
-    inputVolume = SampleData.downloadSample('SpineGuidanceStudyModule1')
+    inputVolume = SampleData.downloadSample('SDesktop_PlannerModule1')
     self.delayDisplay('Loaded test data set')
 
     inputScalarRange = inputVolume.GetImageData().GetScalarRange()
@@ -779,7 +779,7 @@ class SpineGuidanceStudyModuleTest(ScriptedLoadableModuleTest):
 
     # Test the module logic
 
-    logic = SpineGuidanceStudyModuleLogic()
+    logic = Desktop_PlannerLogic()
 
     # todo: add logic test code here
 
