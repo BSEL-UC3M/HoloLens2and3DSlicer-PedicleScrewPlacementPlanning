@@ -761,8 +761,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 					newScrew = self.LoadModelFromFile(fileName, colorArray, True) # Load the corresponding model from file and assign to it its corresponding color
 					newScrew.SetName(screwName) # Rename the model with the format Screw-1, Screw-2, etc.
 					self.ApplyTransformToObject(newScrew, transformName) # Apply the transform to the model
-					if (colorArray[2] == 0): # If the color has no blue it's because the model is orange (fixed within the spine). In that case, include this trasnform within the spine's
-						self.ApplyTransformToObject(tNode, "Spine_T") 
+					self.ApplyTransformToObject(tNode, "Spine_T") 
 			
 				
 

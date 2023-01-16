@@ -25,15 +25,13 @@ public class SendMessageToServer : MonoBehaviour
         GameObject modelGO = model_InspectorInfo._gameObject;
         string modelDiameter = model_InspectorInfo._diameter;
         string modelLength = model_InspectorInfo._length;
-        //string modelID = model_InspectorInfo._ID.ToString();
         string numberOfScrews = (GameObject.FindGameObjectsWithTag("Screw").Length).ToString();
-        //string destroyModel = (model_InspectorInfo._destroy).ToString();
         string modelNumber = model_InspectorInfo._number.ToString();
         string modelColor = model_InspectorInfo._color;
         string fileName;
         if (modelName.Contains("Screw"))
         {
-            fileName = "D" + modelDiameter + "L" + modelLength + ".stl";
+            fileName = "D" + modelDiameter + "L" + modelLength + ".obj"; // Name of the file to be loaded in Slicer
         }
         else 
         {
