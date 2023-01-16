@@ -106,7 +106,25 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
 			self.ui.saveDataButton.connect('clicked(bool)', self.onSaveDataClicked)
 
+	def cleanup(self):
+				"""
+				Called when the application closes and the module widget is destroyed.
+				"""
+				self.removeObservers()
 
+	def enter(self):
+			"""
+			Called each time the user opens this module.
+			"""
+			# Make sure parameter node exists and observed
+			self.initializeParameterNode()
+
+	def exit(self):
+			"""
+			Called each time the user opens a different module.
+			"""
+			# Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
+			self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
 
 
 	def onSceneStartClose(self, caller, event):
