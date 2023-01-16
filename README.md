@@ -23,7 +23,7 @@ It contains four folders:
  - AR_Planner-Unity: It is the Unity project developed for the AR planner. It connects to 3D Slicer through OpenIGTLink to complement the AR planner. It is the second part of the "AR method".
 
 
-All models required for this study are already uploaded to Resources/Models/ in both projects. In case you want to use your own models, please update them all to these folders. Please, always use .obj extension for 3D model files.
+All models required for this study are already uploaded to Resources/Models/ in both projects. In case you want to use your own models, update them all to these folders. Please, always use .obj extension for 3D model files.
 
 ## 3D Slicer modules
 
