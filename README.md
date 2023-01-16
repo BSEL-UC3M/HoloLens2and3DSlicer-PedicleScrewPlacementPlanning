@@ -7,21 +7,20 @@ The study presents a novel approach to communicate Microsoft HoloLens 2 and 3D S
 
 This repository presents two planning methods for the abovementioned clinical procedure:
 
- - AR method: It couples Microsoft HoloLens 2 to 3D Slicer using OpenIGTLink communication protocol. In the final application, a user can move a plane along a virtual 3D model of a patient’s spine and display the corresponding resliced 2D image from the CT
- [imagen AR method]
+ - AR method: It couples Microsoft HoloLens 2 to 3D Slicer using OpenIGTLink communication protocol. In the final application, a user can move a plane along a virtual 3D model of a patient’s spine and display the corresponding resliced 2D image from the CT.
  - Desktop method: 2D desktop planner developed in 3D Slicer to compare with the AR application.
- [imagen desktop method]
 
 There are four folders in this repository:
 
- - Resources: It contains all the resources used in the study, including the patient's information (CT scans and 3D models) and the pedicle screw models.
+ - *Resources*: It contains all the resources used in the study, including the patient's information (CT scans and 3D models) and the pedicle screw models.
 
- - Desktop_Planner-3DSlicer: It includes the 3D Slicer module that simulates a traditional desktop planner. It is used for the "Desktop method".
+ - *Desktop_Planner-3DSlicer*: 3D Slicer module that simulates a traditional desktop planner. It is used for the "Desktop method".
 
- - AR_Planner-3DSlicer: It has the 3D Slicer module that complements the AR planning method. It is employed as part of the "AR method".
+ - *AR_Planner-3DSlicer*: 3D Slicer module that complements the AR planning method. It is employed as part of the "AR method".
+
 All models required for this study are already uploaded to Resources/Models/ in both 3D Slicer projects. In case you want to use your own models, update them all to these folders. Please, always use .obj extension for 3D model files.
 
- - AR_Planner-Unity: It is the Unity project developed for the AR planner. It connects to 3D Slicer through OpenIGTLink to complement the AR planner. It is the second part of the "AR method".
+ - *AR_Planner-Unity*: Unity project developed for the AR planner. It streams the AR application to Microsoft HoloLens 2 in real time. It is the second part of the "AR method".
 
 
 For more information, read the README.md file within each folder.
@@ -37,4 +36,4 @@ For more information, read the README.md file within each folder.
 If you fine our work helpful, please, consider citing our paper:
 [...]
 
-This repository borrows code from [https://github.com/franklinwk/OpenIGTLink-Unity and https://github.com/ronja-tutorials/ShaderTutorials/blob/master/Assets/021_Clipping_Plane/ClippingPlane.shader]. Please, acknowledge their work if you find this repository useful!
+This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
