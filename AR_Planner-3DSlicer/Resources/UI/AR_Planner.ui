@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
-    <height>824</height>
+    <width>1020</width>
+    <height>831</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -215,7 +215,7 @@
          <bool>true</bool>
         </property>
         <property name="checked">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="tristate">
          <bool>false</bool>
@@ -304,7 +304,7 @@
       <item row="0" column="1">
        <widget class="ctkDirectoryButton" name="savingPath">
         <property name="directory">
-         <string>G:/Shared drives/GR.INV. BIIG-IGT/Projects/ARinSlicer/2-SpinalScrews_Queens/Data_recorded</string>
+         <string>.</string>
         </property>
        </widget>
       </item>
