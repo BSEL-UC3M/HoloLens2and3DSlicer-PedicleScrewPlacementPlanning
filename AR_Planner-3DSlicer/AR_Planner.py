@@ -620,7 +620,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 			# To allow re-run of this script, try to reuse exisiting node before creating a new one
 
-			outputNodeName = "CT_slide"
+			outputNodeName = "CT_reslice"
 			outputNode = slicer.mrmlScene.GetFirstNodeByName(outputNodeName)
 			if outputNode is None:
 					outputNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode", outputNodeName)
