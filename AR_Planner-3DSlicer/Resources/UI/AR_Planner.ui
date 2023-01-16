@@ -17,14 +17,14 @@
       <string>Input image</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <item row="0" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Input volume:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="2" column="1">
        <widget class="qMRMLNodeComboBox" name="inputSelector">
         <property name="enabled">
          <bool>true</bool>
@@ -54,14 +54,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>Image threshold:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="4" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label_4">
@@ -127,10 +127,31 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="1">
+      <item row="5" column="1">
        <widget class="ctkPushButton" name="createImageSlideButton">
         <property name="text">
          <string>Create Image slide</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="ctkPathLineEdit" name="inputVolumePath">
+        <property name="currentPath">
+         <string>D:\Projects\UnityGitHub\ARforPedicleScrews_3DSlicer\ARforSpinalScrews\ARforSpinalScrews\Resources\Models</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Load Input volume:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="ctkPushButton" name="loadInputVolumeButton">
+        <property name="text">
+         <string>Load input volume</string>
         </property>
        </widget>
       </item>
@@ -254,14 +275,14 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Saving path: </string>
+         <string>Save Location</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_12">
         <property name="text">
-         <string>Patient: </string>
+         <string>Patient ID: </string>
         </property>
        </widget>
       </item>
@@ -271,7 +292,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>User:</string>
+         <string>User ID:</string>
         </property>
        </widget>
       </item>
@@ -281,7 +302,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>Repetition: </string>
+         <string>Repetition (remove?): </string>
         </property>
        </widget>
       </item>
@@ -291,7 +312,7 @@
       <item row="5" column="1">
        <widget class="QPushButton" name="saveDataButton">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="toolTip">
          <string>Run the algorithm.</string>

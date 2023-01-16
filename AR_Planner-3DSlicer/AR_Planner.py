@@ -94,7 +94,10 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self.ui.patientID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 			self.ui.userID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 			self.ui.repetitionNumber_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
-			self.ui.savingPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
+
+			# self.ui.savingPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
+			self.ui.savingPath.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
+
 			self.ui.saveDataButton.connect("clicked(bool)", self.updateParameterNodeFromGUI)
 
 			# Buttons
@@ -105,6 +108,18 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
 			self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
 			self.ui.saveDataButton.connect('clicked(bool)', self.onSaveDataClicked)
+
+			# Make sure parameter node is initialized (needed for module reload)
+			self.initializeParameterNode()
+			self.initializeGUI() # This is an addition to avoid initializing parameter node before connections
+			# self.updateWidgetsForCurrentVolume()
+			# self.onResetNeedleButton()
+
+	def initializeGUI(self):
+		# initailize the save directory using settings
+		settings = slicer.app.userSettings()
+		if settings.value(self.logic.SAVING_DIRECTORY): # if the settings exists
+			self.ui.savingPath.directory = settings.value(self.logic.SAVING_DIRECTORY)
 
 	def cleanup(self):
 				"""
@@ -172,9 +187,9 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			if not self._parameterNode.GetNodeReference(self.logic.MODELS_DIRECTORY):
 					modelsPath = os.path.join(os.path.dirname(__file__), 'Resources/Models')
 					self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, modelsPath)
-			if not self._parameterNode.GetNodeReference(self.logic.SAVING_DIRECTORY):
-					savingPath = "C:\temp"
-					self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, savingPath)
+			# if not self._parameterNode.GetNodeReference(self.logic.SAVING_DIRECTORY):
+			# 		savingPath = "C:\temp"
+			# 		self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, savingPath)
 
 	def setParameterNode(self, inputParameterNode):
 			"""
@@ -263,7 +278,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, dirname)
 			self._parameterNode.SetParameter(self.logic.SPINE_FILENAME, spineFileName)
 			
-			self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, self.ui.savingPath.directory)
+			# self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, self.ui.savingPath.directory)
 			self._parameterNode.EndModify(wasModified)
 
 
@@ -346,8 +361,13 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 				self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - INACTIVE"
 				
 
+	# Saving results
+	def onSaveDirectoryChanged(self, directory):
+		# update settings with the new directory
+		settings = slicer.app.userSettings()
+		settings.setValue(self.logic.SAVING_DIRECTORY, directory)
+		print("Saving directory changed to: " + directory)
 
-					
 	def onSaveDataClicked(self):
 			"""
 			Run processing when user clicks "Save Data" button.
@@ -765,10 +785,14 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 			cnode = slicer.util.getNode('IGTLConnector')
 			cnode.Stop()     
 	
-
 	def SaveData(self):
 			parameterNode = self.getParameterNode()
-			save_selected_folder_path = parameterNode.GetParameter(self.SAVING_DIRECTORY)
+			# save_selected_folder_path = parameterNode.GetParameter(self.SAVING_DIRECTORY) # This uses the parameter node when it should use settings
+
+			# Get the Save Directory from slicer settings
+			settings = slicer.app.userSettings()
+			saveDirectory = settings.value(self.SAVING_DIRECTORY)
+
 			patientID = parameterNode.GetParameter(self.PATIENT_ID)
 			userID = parameterNode.GetParameter(self.USER_ID)
 			repetitionNumber = parameterNode.GetParameter(self.REPETITION_NUMBER)
@@ -779,7 +803,9 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 			currentDate = time.strftime("%Y-%m-%d_%H-%M-%S")
 			
 			# Saving folder paths
-			save_folder_path = os.path.join(save_selected_folder_path, "Patient_00" + patientID, "User_" + userID, "Repetition_" + repetitionNumber)
+			# save_folder_path = os.path.join(save_selected_folder_path, "Patient_00" + patientID, "User_" + userID, "Repetition_" + repetitionNumber)
+			save_folder_path = os.path.join(saveDirectory, "Patient_00" + patientID, "User_" + userID)
+
 			
 
 			# Create the saving folder if it doesn't exist
