@@ -97,7 +97,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
 		self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
 		self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
-		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
+		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked) #**
 		self.ui.saveDataButton.connect('clicked(bool)', self.onSaveDataClicked)
 
 		# Make sure parameter node is initialized (needed for module reload)
@@ -404,7 +404,8 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 	PATIENT_ID = 'PatientID'
 	USER_ID = 'UserID'
 
-
+	# Parameters
+	CT_RESLICE_OUTPUT = 'CT_reslice'
 
 
 
@@ -426,9 +427,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		if not parameterNode.GetParameter(self.ACTIVE_SERVER_CHECKBOX):
 				parameterNode.SetParameter(self.ACTIVE_SERVER_CHECKBOX, "0")
 
-	
-
-
 	def UpdateImageLimits(self):
 		"""
 		Update the image limits according to INPUT_VOLUME.
@@ -441,9 +439,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		maxValue = imageArray.max()
 
 		parameterNode.SetParameter(self.IMAGE_HIST_SLIDEBAR_minLimit, str(minValue))
-		parameterNode.SetParameter(self.IMAGE_HIST_SLIDEBAR_maxLimit, str(maxValue))
-
-			
+		parameterNode.SetParameter(self.IMAGE_HIST_SLIDEBAR_maxLimit, str(maxValue))			
 
 	def UpdateImageValuesWithSlider(self, lower, upper):
 		"""
@@ -462,6 +458,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		parameterNode.SetParameter(self.WINDOW_WIDTH, str(windowWidth))
 		parameterNode.SetParameter(self.WINDOW_LEVEL, str(windowLevel))
 
+	# Added by Alicia
 	def UpdateWWvalue(self, ww_value):
 		"""
 		Update Window width according to the WW spinbox content.
@@ -475,6 +472,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		parameterNode.SetParameter(self.WINDOW_WIDTH, str(ww_value))
 
+	# Added by Alicia
 	def UpdateWLvalue(self, wl_value):
 		"""
 		Update Window level according to the WW spinbox content.
@@ -604,11 +602,17 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		# To allow re-run of this script, try to reuse exisiting node before creating a new one
 
-		outputNodeName = "CT_reslice"
-		outputNode = slicer.mrmlScene.GetFirstNodeByName(outputNodeName)
+		# outputNodeName = "CT_reslice"
+		# outputNode = slicer.mrmlScene.GetFirstNodeByName(outputNodeName) # ** This is not something to change now, but getting nodes by name is not robust!
+		# Get the output node by ID instead
+		outputNode = parameterNode.GetNodeReference(self.CT_RESLICE_OUTPUT)
 		if outputNode is None:
-				outputNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode", outputNodeName)
-
+				outputNode = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode", self.CT_RESLICE_OUTPUT)
+				# Add it to the parameter node, this way we can add it to the IGTLink output
+				parameterNode.SetNodeReferenceID(self.CT_RESLICE_OUTPUT, outputNode.GetID())
+				# get the node again, and print it
+				outputNode = parameterNode.GetNodeReference(self.CT_RESLICE_OUTPUT)
+		
 		outputNode.SetAndObserveImageData(reslice.GetOutput())
 		outputNode.SetSpacing(outputSpacing)
 		outputNode.CreateDefaultDisplayNodes()
@@ -762,6 +766,13 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		if status == 1:
 				cnode.Start()
 				logging.debug('Connection Successful')
+				# Add CT_reslice to the output of the connector
+				parameterNode = self.getParameterNode()
+				# Get the CT_RESLICE node from parameter node
+				outputNode = parameterNode.GetNodeReference(self.CT_RESLICE_OUTPUT)
+				# Add the node to the connector
+				cnode.RegisterOutgoingMRMLNode(outputNode)
+
 		
 		else:
 				print ('ERROR: Unable to activate server')
