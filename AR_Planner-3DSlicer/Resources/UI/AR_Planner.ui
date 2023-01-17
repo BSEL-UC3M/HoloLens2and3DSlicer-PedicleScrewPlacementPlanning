@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1020</width>
-    <height>831</height>
+    <height>1165</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -25,187 +25,218 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="ctkCollapsibleButton" name="InputImageCollapsibleButton">
      <property name="text">
-      <string>Input image</string>
+      <string>Inputs</string>
      </property>
      <layout class="QFormLayout" name="formLayout_2">
-      <item row="2" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
          <string>Input volume:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="qMRMLNodeComboBox" name="inputSelector">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string>Pick the input to the algorithm.</string>
-        </property>
-        <property name="nodeTypes">
-         <stringlist>
-          <string>vtkMRMLScalarVolumeNode</string>
-         </stringlist>
-        </property>
-        <property name="showChildNodeTypes">
-         <bool>false</bool>
-        </property>
-        <property name="noneEnabled">
-         <bool>true</bool>
-        </property>
-        <property name="addEnabled">
-         <bool>false</bool>
-        </property>
-        <property name="removeEnabled">
-         <bool>false</bool>
-        </property>
-        <property name="selectNodeUponCreation">
-         <bool>true</bool>
-        </property>
+      <item row="6" column="1">
+       <widget class="QWidget" name="horizontalWidget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="qMRMLNodeComboBox" name="inputSelector">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>Select the input image volume</string>
+           </property>
+           <property name="nodeTypes">
+            <stringlist>
+             <string>vtkMRMLScalarVolumeNode</string>
+            </stringlist>
+           </property>
+           <property name="showChildNodeTypes">
+            <bool>true</bool>
+           </property>
+           <property name="noneEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="addEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="removeEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="interactionNodeSingletonTag">
+            <string/>
+           </property>
+           <property name="selectNodeUponCreation">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ctkPathLineEdit" name="inputVolumePath">
+           <property name="currentPath">
+            <string>D:\Projects\UnityGitHub\ARforPedicleScrews_3DSlicer\ARforSpinalScrews\ARforSpinalScrews\Resources\Models</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ctkPushButton" name="loadInputVolumeButton">
+           <property name="text">
+            <string>Load volume</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Image threshold:</string>
+         <string>Adjust image visualization:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Window width :</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="image_WW">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>800</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="ctkDoubleRangeSlider" name="imageHistogramSlideBar">
-          <property name="minimum">
-           <double>-5000.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>5000.000000000000000</double>
-          </property>
-          <property name="minimumValue">
-           <double>200.000000000000000</double>
-          </property>
-          <property name="maximumValue">
-           <double>1000.000000000000000</double>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="symmetricMoves">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="image_WL">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>600</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>: Window level</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="13" column="1">
+       <widget class="QWidget" name="gridWidget_2" native="true">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="1" column="0">
+          <widget class="ctkPushButton" name="createImageSliceButton">
+           <property name="text">
+            <string>Create image reslice</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>WW :</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="image_WW">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximum">
+              <number>1000</number>
+             </property>
+             <property name="value">
+              <number>800</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="ctkDoubleRangeSlider" name="imageHistogramSlideBar">
+             <property name="minimum">
+              <double>-5000.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>5000.000000000000000</double>
+             </property>
+             <property name="minimumValue">
+              <double>200.000000000000000</double>
+             </property>
+             <property name="maximumValue">
+              <double>1000.000000000000000</double>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="symmetricMoves">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="image_WL">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="maximum">
+              <number>1000</number>
+             </property>
+             <property name="value">
+              <number>600</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>WL</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </item>
-      <item row="5" column="1">
-       <widget class="ctkPushButton" name="createImageSlideButton">
+      <item row="15" column="0">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Create Image slide</string>
+         <string>Spine model:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="ctkPathLineEdit" name="inputVolumePath">
-        <property name="currentPath">
-         <string>D:\Projects\UnityGitHub\ARforPedicleScrews_3DSlicer\ARforSpinalScrews\ARforSpinalScrews\Resources\Models</string>
-        </property>
+      <item row="15" column="1">
+       <widget class="QWidget" name="horizontalWidget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="qMRMLNodeComboBox" name="spineModelSelector">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>Select spine model</string>
+           </property>
+           <property name="nodeTypes">
+            <stringlist>
+             <string>vtkMRMLModelNode</string>
+            </stringlist>
+           </property>
+           <property name="showChildNodeTypes">
+            <bool>false</bool>
+           </property>
+           <property name="noneEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="addEnabled">
+            <bool>false</bool>
+           </property>
+           <property name="removeEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ctkPathLineEdit" name="modelsPath">
+           <property name="currentPath">
+            <string>D:\Projects\UnityGitHub\ARforPedicleScrews_3DSlicer\ARforSpinalScrews\ARforSpinalScrews\Resources\Models</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="ctkPushButton" name="loadSpineModelButton">
+           <property name="text">
+            <string>Load model</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_9">
+      <item row="16" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Load Input volume:</string>
+         <string>Screws directory</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="ctkPushButton" name="loadInputVolumeButton">
-        <property name="text">
-         <string>Load input volume</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="imageSliceName">
-     <property name="text">
-      <string>Image slice name:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="ctkCollapsibleButton" name="InputModelsCollapsibleButton">
-     <property name="text">
-      <string>Input models</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Spine model:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="ctkPathLineEdit" name="modelsPath">
-          <property name="currentPath">
-           <string>D:\Projects\UnityGitHub\ARforPedicleScrews_3DSlicer\ARforSpinalScrews\ARforSpinalScrews\Resources\Models</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <widget class="ctkPushButton" name="loadSpineModelButton">
-        <property name="text">
-         <string>Load spine model</string>
-        </property>
-       </widget>
+      <item row="16" column="1">
+       <widget class="ctkDirectoryButton" name="DirectoryButton"/>
       </item>
      </layout>
     </widget>
@@ -222,53 +253,89 @@ p, li { white-space: pre-wrap; }
       <bool>false</bool>
      </property>
      <layout class="QFormLayout" name="formLayout_4">
-      <item row="1" column="0">
-       <widget class="QLabel" name="OIGTLconnectionLabel">
-        <property name="text">
-         <string>OpenIGTLink server - INACTIVE</string>
-        </property>
-       </widget>
+      <item row="0" column="1">
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="serverActiveCheckBox">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>30</width>
+            <height>30</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="tristate">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="OIGTLconnectionLabel">
+          <property name="text">
+           <string>   OpenIGTLink server - INACTIVE</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="serverActiveCheckBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-        <property name="tristate">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string/>
-        </property>
+      <item row="0" column="0">
+       <widget class="QWidget" name="gridWidget" native="true">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>                                           </string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="ctkPushButton" name="loadScrewModelsButton">
+    <widget class="ctkCollapsibleButton" name="saveDataCollapsibleButton_2">
      <property name="text">
-      <string>Load screw models</string>
+      <string>Update screws in scene</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+     <property name="collapsed">
+      <bool>false</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout_6">
+      <item row="1" column="1">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="ctkPushButton" name="loadScrewModelsButton">
+          <property name="text">
+           <string>Load screw models</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -287,6 +354,13 @@ p, li { white-space: pre-wrap; }
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Save Location</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="ctkDirectoryButton" name="savingPath">
+        <property name="directory">
+         <string>.</string>
         </property>
        </widget>
       </item>
@@ -310,17 +384,7 @@ p, li { white-space: pre-wrap; }
       <item row="3" column="1">
        <widget class="QLineEdit" name="userID_text"/>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Repetition (remove?): </string>
-        </property>
-       </widget>
-      </item>
       <item row="4" column="1">
-       <widget class="QLineEdit" name="repetitionNumber_text"/>
-      </item>
-      <item row="5" column="1">
        <widget class="QPushButton" name="saveDataButton">
         <property name="enabled">
          <bool>true</bool>
@@ -333,14 +397,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="ctkDirectoryButton" name="savingPath">
-        <property name="directory">
-         <string>.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
+      <item row="5" column="1">
        <widget class="QLabel" name="filesSavedLabel">
         <property name="text">
          <string>Files saved at:</string>
@@ -364,13 +421,11 @@ p, li { white-space: pre-wrap; }
     </spacer>
    </item>
   </layout>
-  <zorder>InputModelsCollapsibleButton</zorder>
   <zorder>InputImageCollapsibleButton</zorder>
   <zorder>OpenIGTLinkCollapsibleButton</zorder>
   <zorder>saveDataCollapsibleButton</zorder>
-  <zorder>imageSliceName</zorder>
-  <zorder>loadScrewModelsButton</zorder>
   <zorder>FittedTextBrowser</zorder>
+  <zorder>saveDataCollapsibleButton_2</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -421,22 +476,6 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>ARforSpinalScrews</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>loadSpineModelButton</receiver>
-   <slot>click()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>787</x>
-     <y>637</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>737</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ARforSpinalScrews</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>serverActiveCheckBox</receiver>
    <slot>toggle()</slot>
    <hints>
@@ -445,8 +484,8 @@ p, li { white-space: pre-wrap; }
      <y>679</y>
     </hint>
     <hint type="destinationlabel">
-     <x>565</x>
-     <y>361</y>
+     <x>145</x>
+     <y>396</y>
     </hint>
    </hints>
   </connection>
@@ -457,28 +496,28 @@ p, li { white-space: pre-wrap; }
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>185</x>
-     <y>666</y>
+     <x>213</x>
+     <y>1119</y>
     </hint>
     <hint type="destinationlabel">
-     <x>389</x>
-     <y>60</y>
+     <x>224</x>
+     <y>124</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>ARforSpinalScrews</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>createImageSlideButton</receiver>
-   <slot>click()</slot>
+   <receiver>spineModelSelector</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>703</x>
-     <y>688</y>
+     <x>385</x>
+     <y>1107</y>
     </hint>
     <hint type="destinationlabel">
-     <x>895</x>
-     <y>186</y>
+     <x>337</x>
+     <y>295</y>
     </hint>
    </hints>
   </connection>

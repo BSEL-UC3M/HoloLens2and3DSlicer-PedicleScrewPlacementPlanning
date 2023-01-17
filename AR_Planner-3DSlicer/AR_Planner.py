@@ -93,7 +93,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self.ui.serverActiveCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 			self.ui.patientID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 			self.ui.userID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
-			self.ui.repetitionNumber_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 
 			# self.ui.savingPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 			self.ui.savingPath.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
@@ -103,7 +102,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			# Buttons
 			self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onChangeInputVolumeClicked)
 			self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageValuesUpdatedWithSlider)
-			self.ui.createImageSlideButton.connect('clicked(bool)', self.onCreateImageSlideClicked)
+			self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
 			self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
 			self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
 			self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
@@ -235,14 +234,14 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			
 			# Update buttons states and tooltips
 			if self._parameterNode.GetNodeReference("InputVolume"):
-					self.ui.createImageSlideButton.toolTip = "Compute output volume"
-					self.ui.createImageSlideButton.enabled = True
+					self.ui.createImageSliceButton.toolTip = "Compute output volume"
+					self.ui.createImageSliceButton.enabled = True
 			else:
-					self.ui.createImageSlideButton.toolTip = "Select input volume nodes"
-					self.ui.createImageSlideButton.enabled = False
+					self.ui.createImageSliceButton.toolTip = "Select input volume nodes"
+					self.ui.createImageSliceButton.enabled = False
 
-			if (self._parameterNode.GetParameter(self.logic.PATIENT_ID)=='') | (self._parameterNode.GetParameter(self.logic.USER_ID)=='') | (self._parameterNode.GetParameter(self.logic.REPETITION_NUMBER)==''):
-					self.ui.saveDataButton.toolTip = "Set patient, user and repetition number"
+			if (self._parameterNode.GetParameter(self.logic.PATIENT_ID)=='') | (self._parameterNode.GetParameter(self.logic.USER_ID)==''):
+					self.ui.saveDataButton.toolTip = "Set patient and user IDs"
 					self.ui.saveDataButton.enabled = False
 			else:
 					self.ui.saveDataButton.toolTip = "Save data"
@@ -273,7 +272,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self._parameterNode.SetParameter(self.logic.ACTIVE_SERVER_CHECKBOX, "true" if self.ui.serverActiveCheckBox.checked else "false")
 			self._parameterNode.SetParameter(self.logic.PATIENT_ID, (self.ui.patientID_text).text)
 			self._parameterNode.SetParameter(self.logic.USER_ID, (self.ui.userID_text).text)
-			self._parameterNode.SetParameter(self.logic.REPETITION_NUMBER, (self.ui.repetitionNumber_text).text)
 			(dirname, spineFileName) = os.path.split(self.ui.modelsPath.currentPath)
 			self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, dirname)
 			self._parameterNode.SetParameter(self.logic.SPINE_FILENAME, spineFileName)
@@ -304,7 +302,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 	
 
-	def onCreateImageSlideClicked(self):
+	def onCreateImageSliceClicked(self):
 			"""
 			Run processing when user clicks "Create Image Slide" button.
 			"""
@@ -312,7 +310,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
 
 					# Compute output
-					self.ui.imageSliceName.text = "Image slice name: " + self.logic.CreateImageSlide()
+					self.logic.CreateImageSlice()
 
 					self.ui.InputImageCollapsibleButton.collapsed = True
 
@@ -420,7 +418,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 	SAVING_DIRECTORY = 'savingPath'
 	PATIENT_ID = 'PatientID'
 	USER_ID = 'UserID'
-	REPETITION_NUMBER = 'RepetitionNumber'
 
 
 
@@ -444,24 +441,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 			if not parameterNode.GetParameter(self.ACTIVE_SERVER_CHECKBOX):
 					parameterNode.SetParameter(self.ACTIVE_SERVER_CHECKBOX, "0")
 
-	'''
-	@vtk.calldata_type(vtk.VTK_OBJECT)
-	def onNodeAdded(self, caller, event, calldata):
-			node = calldata
-			if ("Screw" in node.GetName()):
-					print(node.GetName())
-					self.addObserver(node, slicer.vtkMRMLTransformableNode.TransformModifiedEvent, self.onScrewTransformModified)
-
-
-	def onScrewTransformModified(self, caller, event):
-		if caller is None:
-			logging.warning('onScrewTransformModified failed: no transform node')
-		else:
-			transformNode = caller
-			self.UpdateModelForTransform(transformNode)
-	'''
-		
-
+	
 
 
 	def UpdateImageLimits(self):
@@ -510,19 +490,14 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 			parameterNode.SetParameter(self.WINDOW_LEVEL, str(wl_value))
 
-
-
-
-			
-
-	def CreateImageSlide(self):
+		
+	def CreateImageSlice(self):
 
 			self.SetVolumeRangeTo_0_255()
 			
 			self.ChangeScalarTypeToUChar()
 
-			imageSliceNameLabel = self.CreateSlide()
-			return imageSliceNameLabel
+			self.CreateSlide()
 
 
 	def SetVolumeRangeTo_0_255(self):
@@ -675,8 +650,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 			observerTag = sliceToRasNode.AddObserver(slicer.vtkMRMLTransformNode.TransformModifiedEvent, UpdateReslice)
 
-			return outputNodeName
-
 
 	def LoadModelFromFile(self, modelFileName, colorRGB_array, visibility_bool):
 			parameterNode = self.getParameterNode()
@@ -693,7 +666,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 	def LoadScrewModelsFromFile(self):
 		modelNodes = slicer.util.getNodesByClass("vtkMRMLModelNode")
-		for modelNode in modelNodes:
+		for modelNode in modelNodes: # Everytime we click on the "Load screw models" button, we delete all screws in the scene. Then we create the new ones.
 			if ("Screw" in modelNode.GetName()):
 				slicer.mrmlScene.RemoveNode(modelNode)
 
@@ -795,7 +768,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 			patientID = parameterNode.GetParameter(self.PATIENT_ID)
 			userID = parameterNode.GetParameter(self.USER_ID)
-			repetitionNumber = parameterNode.GetParameter(self.REPETITION_NUMBER)
 			spineModel_node = parameterNode.GetNodeReference(self.SPINE_MODEL)
 			spineT_node = parameterNode.GetNodeReference(self.SPINE_TRANSFORM)
 
@@ -803,7 +775,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 			currentDate = time.strftime("%Y-%m-%d_%H-%M-%S")
 			
 			# Saving folder paths
-			# save_folder_path = os.path.join(save_selected_folder_path, "Patient_00" + patientID, "User_" + userID, "Repetition_" + repetitionNumber)
+			# save_folder_path = os.path.join(save_selected_folder_path, "Patient_00" + patientID, "User_" + userID)
 			save_folder_path = os.path.join(saveDirectory, "Patient_00" + patientID, "User_" + userID)
 
 			
@@ -815,7 +787,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 			## Save the scene
 			# Generate file name
-			sceneName = "{}_{}_patient{}_user{}_repNumber{}".format(currentDate, "Scene", patientID, userID, repetitionNumber)
+			sceneName = "{}_{}_patient{}_user{}".format(currentDate, "Scene", patientID, userID)
 			sceneSaveFilename = os.path.join(save_folder_path, sceneName + ".mrb")
 			# Save scene
 			if slicer.util.saveScene(sceneSaveFilename):

@@ -25,16 +25,9 @@ p, li { white-space: pre-wrap; }
    <item>
     <widget class="ctkCollapsibleButton" name="inputsCollapsibleButton">
      <property name="text">
-      <string>Volume selection</string>
+      <string>Inputs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Spine model</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -42,26 +35,11 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="qMRMLNodeComboBox" name="usVolumeComboBox">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="nodeTypes">
-         <stringlist notr="true">
-          <string>vtkMRMLScalarVolumeNode</string>
-         </stringlist>
-        </property>
-        <property name="hideChildNodeTypes">
-         <stringlist notr="true"/>
-        </property>
-        <property name="interactionNodeSingletonTag">
-         <string notr="true"/>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="2">
        <widget class="qMRMLNodeComboBox" name="spineModelComboBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="nodeTypes">
          <stringlist notr="true">
           <string>vtkMRMLModelNode</string>
@@ -75,6 +53,63 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="interactionNodeSingletonTag">
          <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="qMRMLNodeComboBox" name="usVolumeComboBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="nodeTypes">
+         <stringlist notr="true">
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="hideChildNodeTypes">
+         <stringlist notr="true"/>
+        </property>
+        <property name="noneEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="interactionNodeSingletonTag">
+         <string notr="true"/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="ctkPathLineEdit" name="PathLineEdit_2"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Spine model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="ctkPathLineEdit" name="PathLineEdit"/>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Load volume</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Load model</string>
         </property>
        </widget>
       </item>
@@ -543,6 +578,13 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
+      <item row="8" column="1">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Files saved at:</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -579,6 +621,11 @@ p, li { white-space: pre-wrap; }
    <header>ctkFittedTextBrowser.h</header>
   </customwidget>
   <customwidget>
+   <class>ctkPathLineEdit</class>
+   <extends>QWidget</extends>
+   <header>ctkPathLineEdit.h</header>
+  </customwidget>
+  <customwidget>
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>
    <header>ctkSliderWidget.h</header>
@@ -608,8 +655,8 @@ p, li { white-space: pre-wrap; }
      <y>358</y>
     </hint>
     <hint type="destinationlabel">
-     <x>431</x>
-     <y>649</y>
+     <x>257</x>
+     <y>90</y>
     </hint>
    </hints>
   </connection>
@@ -624,8 +671,8 @@ p, li { white-space: pre-wrap; }
      <y>358</y>
     </hint>
     <hint type="destinationlabel">
-     <x>431</x>
-     <y>677</y>
+     <x>522</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>
@@ -640,8 +687,8 @@ p, li { white-space: pre-wrap; }
      <y>435</y>
     </hint>
     <hint type="destinationlabel">
-     <x>290</x>
-     <y>105</y>
+     <x>257</x>
+     <y>119</y>
     </hint>
    </hints>
   </connection>
