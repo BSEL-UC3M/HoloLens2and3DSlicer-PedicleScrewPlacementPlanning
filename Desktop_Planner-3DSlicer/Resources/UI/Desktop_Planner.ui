@@ -57,7 +57,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="qMRMLNodeComboBox" name="usVolumeComboBox">
+       <widget class="qMRMLNodeComboBox" name="inputVolumeComboBox">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -107,9 +107,9 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="2" column="4">
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="loadSpineButton">
         <property name="text">
-         <string>Load model</string>
+         <string>Load spine</string>
         </property>
        </widget>
       </item>
@@ -165,7 +165,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QPushButton" name="loadModelButton">
+       <widget class="QPushButton" name="loadScrewButton">
         <property name="text">
          <string>Load screw model</string>
         </property>
@@ -226,7 +226,7 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
-      <widget class="qMRMLNodeComboBox" name="needleTransformComboBox">
+      <widget class="qMRMLNodeComboBox" name="screwTransformComboBox">
        <property name="nodeTypes">
         <stringlist notr="true">
          <string>vtkMRMLLinearTransformNode</string>
@@ -333,7 +333,7 @@ p, li { white-space: pre-wrap; }
       <item row="2" column="0" colspan="3">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QPushButton" name="needleInLargeButton">
+         <widget class="QPushButton" name="screwInLargeButton">
           <property name="text">
            <string>In 10 mm</string>
           </property>
@@ -366,7 +366,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="needleOutLargeButton">
+         <widget class="QPushButton" name="screwOutLargeButton">
           <property name="text">
            <string>Out 10 mm</string>
           </property>
@@ -511,7 +511,7 @@ p, li { white-space: pre-wrap; }
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="resetNeedleButton">
+      <widget class="QPushButton" name="resetScrewButton">
        <property name="text">
         <string>Reset task</string>
        </property>
@@ -562,7 +562,7 @@ p, li { white-space: pre-wrap; }
        <widget class="QLineEdit" name="userIDLineEdit"/>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="participantIDLineEdit"/>
+       <widget class="QLineEdit" name="patientIDLineEdit"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_7">
@@ -579,9 +579,9 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="8" column="1">
-       <widget class="QLabel" name="label_5">
+       <widget class="QLabel" name="FilesSavedText">
         <property name="text">
-         <string>Files saved at:</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -647,7 +647,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>SpineGuidanceStudyModule</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>usVolumeComboBox</receiver>
+   <receiver>inputVolumeComboBox</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -663,7 +663,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>SpineGuidanceStudyModule</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>needleTransformComboBox</receiver>
+   <receiver>screwTransformComboBox</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">

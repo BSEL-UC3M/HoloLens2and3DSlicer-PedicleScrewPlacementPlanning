@@ -22,17 +22,11 @@ class Desktop_Planner(ScriptedLoadableModule):
     ScriptedLoadableModule.__init__(self, parent)
     self.parent.title = "Desktop_Planner"
     self.parent.categories = ["PedicleScrewPlacementPlanner"]
-    self.parent.dependencies = []  # TODO: add here list of module names that this module requires
     self.parent.contributors = ["Alicia Pose (Universidad Carlos III de Madrid) and David Morton (Queen's University)"]
-    self.parent.helpText = """
-        This module facilitates simulated needle placement in the context of previously scanned images or volumes.
-        See more information in <a href="https://github.com/PerkLab/Desktop_Planner">module documentation</a>.
-        """
-    # TODO: replace with organization, grant and thanks
-    self.parent.acknowledgementText = """
-        This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
-        and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
-        """
+    """
+    This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
+    and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
+    """
 
 
 #
@@ -87,13 +81,16 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # (in the selected parameter node).
     
     # VOLUME SELECTION
-    self.ui.usVolumeComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onUsVolumeSelected)
+    self.ui.inputVolumeComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onInputVolumeSelected)
+
+    # SPINE SELECTION
     self.ui.spineModelComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onSpineModelSelected)
+    self.ui.loadScrewButton.connect('clicked(bool)', self.onLoadSpineButtonClicked)
     
     # SCREW SELECTION
     # The screw length and diameter are initizalied in the wigit viewer directly
-    self.ui.loadModelButton.connect('clicked(bool)', self.onLoadModelButtonClicked)
-    self.ui.needleTransformComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onNeedleTransformSelected)
+    self.ui.loadScrewButton.connect('clicked(bool)', self.onLoadScrewButtonClicked)
+    self.ui.screwTransformComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onScrewTransformSelected)
 
 
     # Translation
@@ -103,8 +100,8 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.downButton.connect('clicked(bool)', self.onDownButton)
     self.ui.inButton.connect('clicked(bool)', self.onInButton)
     self.ui.outButton.connect('clicked(bool)', self.onOutButton)
-    self.ui.needleInLargeButton.connect('clicked(bool)', self.onInLargeButton)
-    self.ui.needleOutLargeButton.connect('clicked(bool)', self.onOutLargeButton)
+    self.ui.screwInLargeButton.connect('clicked(bool)', self.onInLargeButton)
+    self.ui.screwOutLargeButton.connect('clicked(bool)', self.onOutLargeButton)
     # Rotation
     self.ui.cranialRotationButton.connect('clicked(bool)', self.onCranialRotationButton)
     self.ui.caudalRotationButton.connect('clicked(bool)', self.onCaudalRotationButton)
@@ -117,20 +114,20 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.leftRotationSlider.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
 
     # Reset buttons
-    self.ui.resetNeedleButton.connect('clicked(bool)', self.onResetNeedleButton)
+    self.ui.resetScrewButton.connect('clicked(bool)', self.onResetScrewButton)
     self.ui.resetViewsButton.connect('clicked(bool)', self.resetViews)
     
     # SAVING RESULTS
     self.ui.saveDirectoryButton.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
     self.ui.userIDLineEdit.connect('textChanged(QString)', self.onUserIDChanged)
-    self.ui.participantIDLineEdit.connect('textChanged(QString)', self.onParticipantIDChanged)
+    self.ui.patientIDLineEdit.connect('textChanged(QString)', self.onPatientIDChanged)
     self.ui.saveButton.connect('clicked(bool)', self.onSaveButton)
 
     # Make sure parameter node is initialized (needed for module reload)
     self.initializeParameterNode()
     self.initializeGUI() # This is an addition to avoid initializing parameter node before connections
     self.updateWidgetsForCurrentVolume()
-    self.onResetNeedleButton()
+    self.onResetScrewButton()
 
   def initializeGUI(self):
     # initailize the save directory using settings
@@ -218,15 +215,15 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     # Update widgets from parameter node
 
-    currentUsVolume = self.ui.usVolumeComboBox.currentNode()
-    referencedVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_US_VOLUME)
-    if currentUsVolume != referencedVolume:
-      self.ui.usVolumeComboBox.setCurrentNode(referencedVolume)
+    currentInputVolume = self.ui.inputVolumeComboBox.currentNode()
+    referencedVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_INPUT_VOLUME)
+    if currentInputVolume != referencedVolume:
+      self.ui.inputVolumeComboBox.setCurrentNode(referencedVolume)
 
-    currentNeedleTransform = self.ui.needleTransformComboBox.currentNode()
-    referencedTransform = self._parameterNode.GetNodeReference(self.logic.NEEDLE_TO_RAS_TRANSFORM)
-    if currentNeedleTransform != referencedTransform:
-      self.ui.needleTransformComboBox.setCurrentNode(referencedTransform)
+    currentScrewTransform = self.ui.screwTransformComboBox.currentNode()
+    referencedTransform = self._parameterNode.GetNodeReference(self.logic.SCREW_TO_RAS_TRANSFORM)
+    if currentScrewTransform != referencedTransform:
+      self.ui.screwTransformComboBox.setCurrentNode(referencedTransform)
 
     # update the sliders from the parameter node
     self.ui.leftRightSlider.value = float(self._parameterNode.GetParameter(self.logic.TRANSLATE_R))
@@ -234,10 +231,8 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.cranialRotationSlider.value = float(self._parameterNode.GetParameter(self.logic.ROTATE_R))
     self.ui.leftRotationSlider.value = float(self._parameterNode.GetParameter(self.logic.ROTATE_S))
 
-    # update participant ID
-    self.ui.participantIDLineEdit.text = self._parameterNode.GetParameter(self.logic.PARTICIPANT_ID)
-
-    # Update buttons states and tooltips
+    # update patient ID
+    self.ui.patientIDLineEdit.text = self._parameterNode.GetParameter(self.logic.PATIENT_ID)
 
     # All the GUI updates are done
     self._updatingGUIFromParameterNode = False
@@ -246,7 +241,7 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """
     Update widget parameters that depend on the size and position of current volume.
     """
-    usVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_US_VOLUME)
+    usVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_INPUT_VOLUME)
     if usVolume is None:
       return
 
@@ -279,16 +274,19 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     self._parameterNode.EndModify(wasModified)
 
-  def onUsVolumeSelected(self, selectedNode):
+  def onInputVolumeSelected(self, selectedNode):
+    """
+    This method is called when the user selects a new input volume
+    """
     if self._parameterNode is None or self._updatingGUIFromParameterNode:
       return
 
-    previousReferencedNode = self._parameterNode.GetNodeReference(self.logic.CURRENT_US_VOLUME)
+    previousReferencedNode = self._parameterNode.GetNodeReference(self.logic.CURRENT_INPUT_VOLUME)
 
     if selectedNode is None:
-      self._parameterNode.SetNodeReferenceID(self.logic.CURRENT_US_VOLUME, "")
+      self._parameterNode.SetNodeReferenceID(self.logic.CURRENT_INPUT_VOLUME, "")
     else:
-      self._parameterNode.SetNodeReferenceID(self.logic.CURRENT_US_VOLUME, selectedNode.GetID())
+      self._parameterNode.SetNodeReferenceID(self.logic.CURRENT_INPUT_VOLUME, selectedNode.GetID())
 
     if previousReferencedNode == selectedNode or selectedNode is None:
       return
@@ -296,6 +294,9 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.updateWidgetsForCurrentVolume()
 
   def onSpineModelSelected(self, selectedNode):
+    """
+    This method is called when the user selects a new spine model
+    """
     if self._parameterNode is None or self._updatingGUIFromParameterNode:
       return
 
@@ -304,26 +305,56 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     else:
       self._parameterNode.SetNodeReferenceID(self.logic.SPINE_MODEL, selectedNode.GetID())
 
-  def onNeedleTransformSelected(self, selectedNode):
+  def onLoadSpineButtonClicked(self):
+    '''
+    This method is called "Load spine" button is clicked
+    '''
+    pass
+
+  def onLoadScrewButtonClicked(self):
+    '''
+    This method is called "Load screw model" button is clicked
+    '''
+    self.updateParameterNodeFromGUI()
+    # screwName = self.ui.modelNameBox.currentText
+    # Get the screw name from the length and diameter boxes instead
+    screwLength = self.ui.screwLengthBox.currentText
+    screwDiameter = self.ui.screwDiameterBox.currentText
+    # If D = 5 and L = 30, then screwName = D5L30
+    screwName = "D" + screwDiameter + "L" + screwLength
+    #screwTransformName = self.ui.screwTransformComboBox.currentNode().GetName()
+    self.screwNumber = self.screwNumber + 1
+    screwTransformName = "Screw-" + str(self.screwNumber) + "_T"
+    screwNode = self.logic.LoadScrewModel(screwName, screwTransformName)
+    screwTransformNode = slicer.util.getFirstNodeByName(screwTransformName)
+    self.ui.screwTransformComboBox.setCurrentNode(screwTransformNode)
+    # set the screw parameters as an attribute of the model
+    screwNode.SetAttribute("ScrewNumber", screwName)
+
+
+  def onScrewTransformSelected(self, selectedNode):
+    '''
+    This method is called when a new transform is selected in the "Screw transform" menu
+    '''
     if self._parameterNode is None or self._updatingGUIFromParameterNode:
       return
 
     if selectedNode is None:
-      self._parameterNode.SetNodeReferenceID(self.logic.NEEDLE_TO_RAS_TRANSFORM, "")
+      self._parameterNode.SetNodeReferenceID(self.logic.SCREW_TO_RAS_TRANSFORM, "")
     else:
-      self._parameterNode.SetNodeReferenceID(self.logic.NEEDLE_TO_RAS_TRANSFORM, selectedNode.GetID())
+      self._parameterNode.SetNodeReferenceID(self.logic.SCREW_TO_RAS_TRANSFORM, selectedNode.GetID())
 
     self.logic.updateParameterNodeFromTransform()
     self.logic.updateTransformFromParameterNode()
 
     self.logic.ResliceDriverToScrew(selectedNode.GetID())
 
-  def onResetNeedleButton(self):
+  def onResetScrewButton(self):
     '''
-    This function resets the position and orientation of the needle to default values determined by the current volume size
+    This function resets the position and orientation of the screw to default values determined by the current volume size
     '''
     # The slider ranges are set according to the current volume
-    # Reset the needle location to the midpont of the slider range
+    # Reset the screw location to the midpont of the slider range
     # Get min and max of the slider range
     minR = self.ui.leftRightSlider.minimum
     maxR = self.ui.leftRightSlider.maximum
@@ -336,8 +367,8 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self._parameterNode.SetParameter(self.logic.ROTATE_R, str(90))
     self._parameterNode.SetParameter(self.logic.ROTATE_S, str(0))
 
-    # If there is a volume, make the needle as far back as possible, else make it 0
-    usVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_US_VOLUME)
+    # If there is a volume, make the screw as far back as possible, else make it 0
+    usVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_INPUT_VOLUME)
     if usVolume is None:
       self._parameterNode.SetParameter(self.logic.TRANSLATE_A, str(0))
     else:
@@ -348,106 +379,142 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # update the transform
     self.logic.updateTransformFromParameterNode()
 
-  def resetViews(self):
-    '''
-    Resets the virtual camera positions
-    '''
-    layoutManager = slicer.app.layoutManager()
-    layoutManager.setLayout(self.LAYOUT_DUAL3D)
-
-    # Setup 3D view 0
-    threeDWidget = layoutManager.threeDWidget(0)
-    threeDView = threeDWidget.threeDView()
-    threeDView.resetFocalPoint()
-    threeDView.rotateToViewAxis(2)
-    viewNode = threeDView.mrmlViewNode()
-    viewNode.SetOrientationMarkerType(viewNode.OrientationMarkerTypeHuman)
-    viewNode.SetOrientationMarkerSize(1)
-    viewNode.SetBoxVisible(False)
-    viewNode.SetAxisLabelsVisible(False)
-
-    # Setup 3D view 1
-    threeDWidget = layoutManager.threeDWidget(1)
-    threeDView = threeDWidget.threeDView()
-    threeDView.resetFocalPoint()
-    threeDView.rotateToViewAxis(0)
-    viewNode = threeDView.mrmlViewNode()
-    viewNode.SetOrientationMarkerType(viewNode.OrientationMarkerTypeHuman)
-    viewNode.SetOrientationMarkerSize(1)
-    viewNode.SetBoxVisible(False)
-    viewNode.SetAxisLabelsVisible(False)
+  
 
   # Tranlation
   def onRightButton(self):
+    '''
+    This method is called when the "Right" button in translation section is clicked
+    '''
     self.ui.leftRightSlider.value = self.ui.leftRightSlider.value + self.logic.STEP_SIZE_TRANSLATION
 
   def onLeftButton(self):
+    '''
+    This method is called when the "Left" button in translation section is clicked
+    '''
     self.ui.leftRightSlider.value = self.ui.leftRightSlider.value - self.logic.STEP_SIZE_TRANSLATION
 
   def onUpButton(self):
+    '''
+    This method is called when the ""Up"" button is clicked
+    '''
     self.ui.upDownSlider.value = self.ui.upDownSlider.value + self.logic.STEP_SIZE_TRANSLATION
 
   def onDownButton(self):
+    '''
+    This method is called when the "Down" button is clicked
+    '''
     self.ui.upDownSlider.value = self.ui.upDownSlider.value - self.logic.STEP_SIZE_TRANSLATION
 
   def onInButton(self):
-    self.logic.moveNeedleIn(1)
+    '''
+    This method is called when the "In 1 mm" button is clicked
+    '''
+    self.logic.moveScrewIn(1)
 
   def onInLargeButton(self):
-    self.logic.moveNeedleIn(10)
+    '''
+    This method is called when the "In 10 mm" button is clicked
+    '''
+    self.logic.moveScrewIn(10)
 
   def onOutButton(self):
-    self.logic.moveNeedleIn(-1)
+    '''
+    This method is called when the "Out 1 mm" button is clicked
+    '''
+    self.logic.moveScrewIn(-1)
 
   def onOutLargeButton(self):
-    self.logic.moveNeedleIn(-10)
+    '''
+    This method is called when the "Out 10 mm" button is clicked
+    '''
+    self.logic.moveScrewIn(-10)
 
   # Rotation
   def onCranialRotationButton(self):
+    '''
+    This method is called when the "Cranial" button is clicked
+    '''
     self.ui.cranialRotationSlider.value = self.ui.cranialRotationSlider.value + self.logic.STEP_SIZE_ROTATION
 
   def onCaudalRotationButton(self):
+    '''
+    This method is called when the "Caudal" button is clicked
+    '''
     self.ui.cranialRotationSlider.value = self.ui.cranialRotationSlider.value - self.logic.STEP_SIZE_ROTATION
 
   def onLeftRotationButton(self):
+    '''
+    This method is called when the "Left" button in rotation section is clicked
+    '''
     self.ui.leftRotationSlider.value = self.ui.leftRotationSlider.value - self.logic.STEP_SIZE_ROTATION
 
   def onRightRotationButton(self):
+    '''
+    This method is called when the "Right" button in rotation section is clicked
+    '''
     self.ui.leftRotationSlider.value = self.ui.leftRotationSlider.value + self.logic.STEP_SIZE_ROTATION
 
+  # Reset view
+  def resetViews(self):
+      '''
+      Resets the virtual camera positions
+      '''
+      layoutManager = slicer.app.layoutManager()
+      layoutManager.setLayout(self.LAYOUT_DUAL3D)
+
+      # Setup 3D view 0
+      threeDWidget = layoutManager.threeDWidget(0)
+      threeDView = threeDWidget.threeDView()
+      threeDView.resetFocalPoint()
+      threeDView.rotateToViewAxis(2)
+      viewNode = threeDView.mrmlViewNode()
+      viewNode.SetOrientationMarkerType(viewNode.OrientationMarkerTypeHuman)
+      viewNode.SetOrientationMarkerSize(1)
+      viewNode.SetBoxVisible(False)
+      viewNode.SetAxisLabelsVisible(False)
+
+      # Setup 3D view 1
+      threeDWidget = layoutManager.threeDWidget(1)
+      threeDView = threeDWidget.threeDView()
+      threeDView.resetFocalPoint()
+      threeDView.rotateToViewAxis(0)
+      viewNode = threeDView.mrmlViewNode()
+      viewNode.SetOrientationMarkerType(viewNode.OrientationMarkerTypeHuman)
+      viewNode.SetOrientationMarkerSize(1)
+      viewNode.SetBoxVisible(False)
+      viewNode.SetAxisLabelsVisible(False)
+ 
   # Saving results
   def onSaveDirectoryChanged(self, directory):
+    '''
+    This method is called when the saving directory is updated
+    '''
     # update settings with the new directory
     settings = slicer.app.userSettings()
     settings.setValue(self.logic.RESULTS_SAVE_DIRECTORY_SETTING, directory)
     
   def onUserIDChanged(self, userID):
+    '''
+    This method is called when the User ID field is updated
+    '''
     # update the user ID in the parameter node
     self._parameterNode.SetParameter(self.logic.USER_ID, userID)
   
-  def onParticipantIDChanged(self, participantID):
-    # update the participant ID in the parameter node
-    self._parameterNode.SetParameter(self.logic.PARTICIPANT_ID, participantID) 
+  def onPatientIDChanged(self, patientID):
+    '''
+    This method is called when the Patient ID field is updated
+    '''
+    # update the onPatientIDChanged ID in the parameter node
+    self._parameterNode.SetParameter(self.logic.PATIENT_ID, patientID) 
 
   def onSaveButton(self):
+    '''
+    This method is called "Save Results" button is clicked
+    '''
     self.logic.saveResults()
 
-  def onLoadModelButtonClicked(self):
-    self.updateParameterNodeFromGUI()
-    # screwName = self.ui.modelNameBox.currentText
-    # Get the screw name from the length and diameter boxes instead
-    screwLength = self.ui.screwLengthBox.currentText
-    screwDiameter = self.ui.screwDiameterBox.currentText
-    # If D = 5 and L = 30, then screwName = D5L30
-    screwName = "D" + screwDiameter + "L" + screwLength
-    #screwTransformName = self.ui.needleTransformComboBox.currentNode().GetName()
-    self.screwNumber = self.screwNumber + 1
-    screwTransformName = "Screw-" + str(self.screwNumber) + "_T"
-    screwNode = self.logic.LoadScrewModel(screwName, screwTransformName)
-    screwTransformNode = slicer.util.getFirstNodeByName(screwTransformName)
-    self.ui.needleTransformComboBox.setCurrentNode(screwTransformNode)
-    # set the screw parameters as an attribute of the model
-    screwNode.SetAttribute("ScrewNumber", screwName)
+  
 
 
 #
@@ -455,13 +522,13 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 #
 
 class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
-  CURRENT_US_VOLUME = "CurrentUsVolume"
-  MOTION_MARGIN = 100  # Allow needle to go outside image volume by this many mm
+  CURRENT_INPUT_VOLUME = "CurrentInputVolume"
+  MOTION_MARGIN = 100  # Allow screw to go outside image volume by this many mm
   STEP_SIZE_TRANSLATION = 1  # Translation single click in mm
   STEP_SIZE_ROTATION = 1  # Rotation single click in degrees
 
-  NEEDLE_TO_RAS_TRANSFORM = "NeedleToRasTransform"
-  NEEDLE_MODEL = "NeedleModel"
+  SCREW_TO_RAS_TRANSFORM = "ScrewToRasTransform"
+  SCREW_MODEL = "ScrewModel"
   TRANSLATE_R = "TranslateR"
   TRANSLATE_A = "TranslateA"
   TRANSLATE_S = "TranslateS"
@@ -470,7 +537,7 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
 
   RESULTS_SAVE_DIRECTORY_SETTING = 'Desktop_Planner/ResultsSaveDirectory'
   USER_ID = "UserID"
-  PARTICIPANT_ID = "ParticipantID"
+  PATIENT_ID = "PatientID"
   screwNumber = 0
 
   def __init__(self):
@@ -478,8 +545,8 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     Called when the logic class is instantiated. Can be used for initializing member variables.
     """
     ScriptedLoadableModuleLogic.__init__(self)
-    self.NEEDLE_TRANSFORM = "needle_RAStoNeedle"
-    self.NEEDLE_TIP = "needleTip"
+    self.SCREW_TRANSFORM = "screw_RAStoScrew"
+    self.SCREW_TIP = "screwTip"
 
   def setDefaultParameters(self, parameterNode):
     """
@@ -502,26 +569,29 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
       parameterNode.SetParameter(self.ROTATE_S, "0")
     pass
 
-  def process(self, inputVolume, outputVolume, imageThreshold, invert=False, showResult=True):
+  def process(self, inputVolume, outputVolume, imageThreshold, invert=False, showResult=True): ######################################################################################## DO WE NEED THIS???
     pass
 
   def setupScene(self):
+    """
+    Set up the scene
+    """
     parameterNode = self.getParameterNode()
 
-    # If NeedleToRasTransform is not in the scene, create and add it
-    needleToRasTransform = slicer.util.getFirstNodeByName(self.NEEDLE_TO_RAS_TRANSFORM)  # ***
-    if needleToRasTransform is None:
-      needleToRasTransform = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLLinearTransformNode', self.NEEDLE_TO_RAS_TRANSFORM)
-      parameterNode.SetNodeReferenceID(self.NEEDLE_TO_RAS_TRANSFORM, needleToRasTransform.GetID())
+    # If ScrewToRasTransform is not in the scene, create and add it
+    screwToRasTransform = slicer.util.getFirstNodeByName(self.SCREW_TO_RAS_TRANSFORM)  # ***
+    if screwToRasTransform is None:
+      screwToRasTransform = slicer.mrmlScene.AddNewNodeByClass('vtkMRMLLinearTransformNode', self.SCREW_TO_RAS_TRANSFORM)
+      parameterNode.SetNodeReferenceID(self.SCREW_TO_RAS_TRANSFORM, screwToRasTransform.GetID())
 
     t90Node=slicer.vtkMRMLLinearTransformNode()
     t90Node.SetName("RotationT")
     slicer.mrmlScene.AddNode(t90Node)
 
-  def previousScene(self):
+  def previousScene(self): ################################################################################################################################################################ DO WE NEED THIS?
     pass
 
-  def nextScene(self):
+  def nextScene(self): ################################################################################################################################################################ DO WE NEED THIS?
     pass
 
   def updateTransformFromParameterNode(self):
@@ -532,20 +602,20 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
 
     # apply the translation and rotation in the world frame: TRANSLATE_R, TRANSLATE_S, ROTATE_R, ROTATE_S
 
-    needleToRasTransform = vtk.vtkTransform()
-    needleToRasTransform.Translate(float(parameterNode.GetParameter(self.TRANSLATE_R)),
+    screwToRasTransform = vtk.vtkTransform()
+    screwToRasTransform.Translate(float(parameterNode.GetParameter(self.TRANSLATE_R)),
                                    float(parameterNode.GetParameter(self.TRANSLATE_A)),
                                    float(parameterNode.GetParameter(self.TRANSLATE_S)))
-    needleToRasTransform.RotateX(float(parameterNode.GetParameter(self.ROTATE_R)) - 90)  # Start at anterior direction
-    needleToRasTransform.RotateY(float(parameterNode.GetParameter(self.ROTATE_S)))
+    screwToRasTransform.RotateX(float(parameterNode.GetParameter(self.ROTATE_R)) - 90)  # Start at anterior direction
+    screwToRasTransform.RotateY(float(parameterNode.GetParameter(self.ROTATE_S)))
 
     # Set the transform to the transform node
 
-    needleToRasTransformNode = parameterNode.GetNodeReference(self.NEEDLE_TO_RAS_TRANSFORM)
-    if needleToRasTransformNode is not None:
-      needleToRasTransformNode.SetAndObserveTransformToParent(needleToRasTransform)
+    screwToRasTransformNode = parameterNode.GetNodeReference(self.SCREW_TO_RAS_TRANSFORM)
+    if screwToRasTransformNode is not None:
+      screwToRasTransformNode.SetAndObserveTransformToParent(screwToRasTransform)
     else:
-      logging.warning("Needle transform not selected yet")
+      logging.warning("Screw transform not selected yet")
 
   def updateParameterNodeFromTransform(self):
     """
@@ -554,35 +624,38 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     """
     parameterNode = self.getParameterNode()
 
-    needleToRasTransformNode = parameterNode.GetNodeReference(self.NEEDLE_TO_RAS_TRANSFORM)
-    if needleToRasTransformNode is None:
+    screwToRasTransformNode = parameterNode.GetNodeReference(self.SCREW_TO_RAS_TRANSFORM)
+    if screwToRasTransformNode is None:
       return
 
-    needleToRasTransform = needleToRasTransformNode.GetTransformToParent()
+    screwToRasTransform = screwToRasTransformNode.GetTransformToParent()
 
-    needleToRasTranslation = np.array(needleToRasTransform.GetPosition())
-    parameterNode.SetParameter(self.TRANSLATE_R, str(needleToRasTranslation[0]))
-    parameterNode.SetParameter(self.TRANSLATE_A, str(needleToRasTranslation[1]))
-    parameterNode.SetParameter(self.TRANSLATE_S, str(needleToRasTranslation[2]))
+    screwToRasTranslation = np.array(screwToRasTransform.GetPosition())
+    parameterNode.SetParameter(self.TRANSLATE_R, str(screwToRasTranslation[0]))
+    parameterNode.SetParameter(self.TRANSLATE_A, str(screwToRasTranslation[1]))
+    parameterNode.SetParameter(self.TRANSLATE_S, str(screwToRasTranslation[2]))
 
     #todo: This does not correctly preserve orientation. We need to figure out how to get rotation values to be compatible
     # with updateTransformFromParameterNode()
 
-    needleToRasOrientation = np.array(needleToRasTransform.GetOrientation())
-    parameterNode.SetParameter(self.ROTATE_R, str(needleToRasOrientation[0] + 90))
-    parameterNode.SetParameter(self.ROTATE_S, str(needleToRasOrientation[1]))
+    screwToRasOrientation = np.array(screwToRasTransform.GetOrientation())
+    parameterNode.SetParameter(self.ROTATE_R, str(screwToRasOrientation[0] + 90))
+    parameterNode.SetParameter(self.ROTATE_S, str(screwToRasOrientation[1]))
 
-  def moveNeedleIn(self, distance):
+  def moveScrewIn(self, distance):
+    """
+    Move selected screw in the "in-out" direction
+    """
     # Get the parameter node
     parameterNode = self.getParameterNode()
     # Get the transform node from the parameter node
-    needleToRasTransformNode = parameterNode.GetNodeReference(self.NEEDLE_TO_RAS_TRANSFORM)
+    screwToRasTransformNode = parameterNode.GetNodeReference(self.SCREW_TO_RAS_TRANSFORM)
     # Get the transform from the transform node
-    needleToRasTransform = needleToRasTransformNode.GetTransformToParent()
+    screwToRasTransform = screwToRasTransformNode.GetTransformToParent()
     # Find distance in terms of R and S
-    Translation_Needle = [0, 0, distance]
-    # Rotate Translation_Needle to the parent frame
-    Translation_RAS = needleToRasTransform.TransformVector(Translation_Needle)
+    Translation_Screw = [0, 0, distance]
+    # Rotate Translation_Screw to the parent frame
+    Translation_RAS = screwToRasTransform.TransformVector(Translation_Screw)
     # Add Translation_RAS to the current translation
     parameterNode.SetParameter(self.TRANSLATE_R, str(float(parameterNode.GetParameter(self.TRANSLATE_R)) + Translation_RAS[0]))
     parameterNode.SetParameter(self.TRANSLATE_A, str(float(parameterNode.GetParameter(self.TRANSLATE_A)) + Translation_RAS[1]))
@@ -599,15 +672,15 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     # Get the parameter node
     parameterNode = self.getParameterNode()
 
-    # FILENAME FORMAT = [Date]_ScrewPlanner_[userID]_[participantID].mrb
+    # FILENAME FORMAT = [Date]_ScrewPlanner_[userID]_[patientID].mrb
     # Get the date in format MMMDD
     date = time.strftime("%b%d")
     # Get the user ID
     userID = parameterNode.GetParameter(self.USER_ID)
-    # Get the participant ID
-    participantID = parameterNode.GetParameter(self.PARTICIPANT_ID)
+    # Get the patient ID
+    patientID = parameterNode.GetParameter(self.PATIENT_ID)
     # Get the file name
-    fileName = date + "_ScrewPlanner_" + userID + "_" + participantID + ".mrb"
+    fileName = date + "_ScrewPlanner_" + userID + "_" + patientID + ".mrb"
     
     # Get the Save Directory from slicer settings
     settings = slicer.app.userSettings()
@@ -617,14 +690,17 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     print( "File Name: " + fileName)
 
 
-    # # Save the NeedleToRasTransform to saveDirectory with fileName
-    # slicer.util.saveNode(needleToRasTransformNode, os.path.join(saveDirectory, fileName))
+    # # Save the ScrewToRasTransform to saveDirectory with fileName
+    # slicer.util.saveNode(screwToRasTransformNode, os.path.join(saveDirectory, fileName))
 
     # Save the current scene to saveDirectory with fileName
     slicer.util.saveScene(os.path.join(saveDirectory, fileName))
 
 
   def LoadScrewModel(self, screwFileNameWOExt, transformName):
+    """
+    Load the screw "screwFileNameWOExt" model from the specified directory and apply the transform "transformName" to it
+    """
     t90Node = slicer.util.getFirstNodeByName("RotationT")
     t90NodeName = t90Node.GetName()
 
@@ -648,6 +724,9 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
 
 
   def LoadModelFromFile(self, modelFileName, colorRGB_array, visibility_bool):
+    """
+		Load the model "modelFileName" from the specified folder. Set its color to colorRGB_array and enable its visibility according to visibility_bool
+		"""
     parameterNode = self.getParameterNode()
     modelFilePath = os.path.join(os.path.dirname(__file__), 'Resources/Models')
     
@@ -688,7 +767,9 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     print ('Transform ' + transformName + ' applied to ' + object.GetName())
 
   def ResliceDriverToScrew(self, transformID):
-    
+    """
+    Use the "Volume Reslice Driver" module to move the Red and Green slides according to the selected screw position
+    """
     #Get the volume reslice logic
     resliceLogic = slicer.modules.volumereslicedriver.logic()
 
