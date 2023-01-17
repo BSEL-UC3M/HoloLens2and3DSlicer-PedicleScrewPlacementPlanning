@@ -34,6 +34,9 @@ For more information, read the README.md file within each folder.
  - Unity version used: 2019.3.9f1
  - For further questions, please contact apose@ing.uc3m.es
 
+## Citation
+This repository will complement a paper that is currently under revision for its publication. When it's accepted, the corresponding citation will be updated here. If you find this useful, we kindly ask that you return to this page to check for the updated citation and cite our work in any related publications.
+
 
 ## Aknowledgements
  - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
