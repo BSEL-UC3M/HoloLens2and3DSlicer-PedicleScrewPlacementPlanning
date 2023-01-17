@@ -8,6 +8,12 @@ The study presents a novel approach to communicate Microsoft HoloLens 2 and 3D S
 This repository presents two planning methods for the abovementioned clinical procedure:
 
  - AR method: It couples Microsoft HoloLens 2 to 3D Slicer using OpenIGTLink communication protocol. In the final application, a user can move a plane along a virtual 3D model of a patient’s spine and display the corresponding resliced 2D image from the CT.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/66890913/212952842-74105c36-9962-48a7-9aee-a0757d6b92d7.jpg" width=50%>
+</p>
+
+
  - Desktop method: 2D desktop planner developed in 3D Slicer to compare with the AR application.
 
 There are four folders in this repository:
