@@ -1,13 +1,15 @@
 # Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer
 ## Application for pedicle screw placement planning
 
-This repository contains all the necessary information to replicate the experiments presented in the paper: "Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer".
-The study presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This approach is then applied towards pedicle screw placement planning.
-
-
-This repository presents two planning methods for the abovementioned clinical procedure:
+This repository presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This connection is applied towards pedicle screw placement planning. Here you will find all the necessary information and resources to run the system in your computer. Specifically, we present planning methods for the abovementioned clinical procedure:
 
  - AR method: It couples Microsoft HoloLens 2 to 3D Slicer using OpenIGTLink communication protocol. In the final application, a user can move a plane along a virtual 3D model of a patient’s spine and display the corresponding resliced 2D image from the CT.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/66890913/212952842-74105c36-9962-48a7-9aee-a0757d6b92d7.jpg" width=50%>
+</p>
+
+
  - Desktop method: 2D desktop planner developed in 3D Slicer to compare with the AR application.
 
 There are four folders in this repository:
@@ -33,7 +35,13 @@ For more information, read the README.md file within each folder.
  - For further questions, please contact apose@ing.uc3m.es
 
 ## Citation
-If you fine our work helpful, please, consider citing our paper:
-[...]
+This repository will complement a paper that is currently under revision for its publication. When it's accepted, the corresponding citation will be updated here. If you find this useful, we kindly ask that you return to this page to check for the updated citation and cite our work in any related publications.
 
-This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+
+## Aknowledgements
+ - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+
+ - Resources: The patient CT scans used in this repository were retrieved from the [VerSe database](https://github.com/anjany/verse). VerSe has resulted in numerous other publications, including the following:
+   + Löffler M, Sekuboyina A, Jakob A, Grau AL, Scharr A, Husseini ME, Herbell M, Zimmer C, Baum T, Kirschke JS. A Vertebral Segmentation Dataset with Fracture Grading. Radiology: Artificial Intelligence, 2020 https://doi.org/10.1148/ryai.2020190138.
+   + Liebl H, Schinz D, Sekuboyina A, ..., Kirschke JS. A computed tomography vertebral segmentation dataset with anatomical variations and multi-vendor scanner data SDATA-21-002892021. doi: 10.1038/s41597-021-01060-0 (preliminary access at https://arxiv.org/abs/2103.06360)
+   + Sekuboyina A, Bayat AH, Husseini ME, Löffler M, Menze BM, ..., Kirschke JS. VerSe: A Vertebrae labelling and segmentation benchmark for multi-detector CT images. Med Image Anal. 2021 Oct;73:102166. doi: 10.1016/j.media.2021.102166. Epub 2021 Jul 22. (preliminary access at https://arxiv.org/abs/2001.09193)
