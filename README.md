@@ -1,9 +1,7 @@
 # Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer
 ## Application for pedicle screw placement planning
 
-This repository contains all the necessary information to replicate the experiments presented in the paper: "Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer".
-The study presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This approach is then applied towards pedicle screw placement planning.
-
+This repository presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This connection is applied towards pedicle screw placement planning. Here you will find all the necessary information and resources to run the system in your computer.
 
 This repository presents two planning methods for the abovementioned clinical procedure:
 
@@ -38,8 +36,11 @@ For more information, read the README.md file within each folder.
  - Unity version used: 2019.3.9f1
  - For further questions, please contact apose@ing.uc3m.es
 
-## Citation
-If you fine our work helpful, please, consider citing our paper:
-[...]
 
-This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+## Aknowledgements
+ - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+
+ - Resources: The patient CT scans used in this repository were retrieved from the [VerSe database](https://github.com/anjany/verse). VerSe has resulted in numerous other publications, including the following:
+   + Löffler M, Sekuboyina A, Jakob A, Grau AL, Scharr A, Husseini ME, Herbell M, Zimmer C, Baum T, Kirschke JS. A Vertebral Segmentation Dataset with Fracture Grading. Radiology: Artificial Intelligence, 2020 https://doi.org/10.1148/ryai.2020190138.
+   + Liebl H, Schinz D, Sekuboyina A, ..., Kirschke JS. A computed tomography vertebral segmentation dataset with anatomical variations and multi-vendor scanner data SDATA-21-002892021. doi: 10.1038/s41597-021-01060-0 (preliminary access at https://arxiv.org/abs/2103.06360)
+   + Sekuboyina A, Bayat AH, Husseini ME, Löffler M, Menze BM, ..., Kirschke JS. VerSe: A Vertebrae labelling and segmentation benchmark for multi-detector CT images. Med Image Anal. 2021 Oct;73:102166. doi: 10.1016/j.media.2021.102166. Epub 2021 Jul 22. (preliminary access at https://arxiv.org/abs/2001.09193)
