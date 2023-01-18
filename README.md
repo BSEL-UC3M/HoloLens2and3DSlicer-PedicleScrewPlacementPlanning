@@ -31,6 +31,7 @@ For more information, read the README.md file within each folder.
 
 ## General information
  - 3D Slicer version used: 3D Slicer 5.0.3
+   + Prerequisites: Before proceeding, install extensions [SlicerIGT](https://github.com/SlicerIGT/SlicerIGT) and [OpenIGTLink](https://github.com/openigtlink/OpenIGTLink) from the Extensions Manager.
  - Unity version used: 2019.3.9f1
  - For further questions, please contact apose@ing.uc3m.es
 
