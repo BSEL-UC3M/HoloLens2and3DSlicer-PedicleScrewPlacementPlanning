@@ -41,7 +41,7 @@ This repository will complement a paper that is currently under revision for pub
 
 
 ## Aknowledgements
- - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+ - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity), [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials), and [IGT-UltrARsound](https://github.com/BIIG-UC3M/IGT-UltrARsound). Please, acknowledge their work if you find this repository useful!
 
  - Resources: The patient CT scans used in this repository were retrieved from the [VerSe database](https://github.com/anjany/verse). VerSe has resulted in numerous other publications, including the following:
    + Löffler M, Sekuboyina A, Jakob A, Grau AL, Scharr A, Husseini ME, Herbell M, Zimmer C, Baum T, Kirschke JS. A Vertebral Segmentation Dataset with Fracture Grading. Radiology: Artificial Intelligence, 2020 https://doi.org/10.1148/ryai.2020190138.
