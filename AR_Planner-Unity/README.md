@@ -3,13 +3,13 @@
  1. Download this project and open it in Unity (version 2021.3.9f1).
  2. Set up the project configuration with MRTK following the steps in [this tutorial](https://learn.microsoft.com/es-es/training/modules/learn-mrtk-tutorials/1-5-exercise-configure-resources?tabs=openxr).
  3. Open the scene *PedicleScrews*.
- 4. In the Hierarchy, click on *OpenIGTLinkConnectHandler* to find the *OpenIGTLinkConnect* script. Specify the IP string and port of your OpenIGTLink server from 3D Slicer.
+ 4. In the Hierarchy, click on *OpenIGTLinkConnectHandler* to find the *OpenIGTLinkConnect* script. Specify the IP string and port of your OpenIGTLink server from 3D Slicer. If 3D Slicer is running on the same computer as Unity, you can write *localhost*.
  5. In the Hierarchy, click on *Models* to find the *PressableButtons* script. Specify the Patient Number.
  6. In the top menu, click on *Mixed Reality > Remoting > Holographic Remoting for Play Mode* to enable the [Holographic Remoting connection](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/native/holographic-remoting-player).
  7. Find your Microsoft HoloLens 2 IP address within the Holographic Remoting Player app and write it in the *Remote Host Name* section.
- 8. Click on *Enable Holographic Remoting for Play Mode*.
+ 8. Click on *Enable Holographic Remoting for Play Mode*. Make sure your HoloLens 2 and your computer are connected to the same WiFi.
  9. Click on the Play button to run the Editor mode.
- 10. Whenever Unity finds your HoloLens 2, it will start rendering the app on them.
+ 10. Whenever Unity finds your HoloLens 2, it will start streaming the app.
 
 
 
