@@ -1,3 +1,5 @@
+# This code has been developed by Alicia Pose Díez de la Lastra (Universidad Carlos III de Madrid) and David Morton (PerkLab)
+# It is based on the template designed by Jean-Christophe Fillion-Robin (Kitware Inc.), Andras Lasso (PerkLab), and Steve Pieper (Isomics, Inc).
 import logging
 import os
 from xml.etree.ElementTree import QName
