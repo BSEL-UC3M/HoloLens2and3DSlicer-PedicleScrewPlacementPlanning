@@ -1,4 +1,4 @@
-// This code was developed by Alicia Pose, from Universidad Carlos III de Madrid
+// This code was developed by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 // This is the main script of the project. 
 // It creates all the functions associated to the pressable buttons in the ControlPanel
 
