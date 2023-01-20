@@ -1,4 +1,4 @@
-// This code was developed by Alicia Pose, from Universidad Carlos III de Madrid
+// This code was developed by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 // This script scales of the 3D biomodels in the scene according to the spine scale
 
 using System.Collections;
