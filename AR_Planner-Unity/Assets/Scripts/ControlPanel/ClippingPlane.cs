@@ -1,4 +1,4 @@
-// This code was developed by Alicia Pose, from Universidad Carlos III de Madrid
+// This code was developed by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 // This script associates the clipping plane material with the image plane gameobject
 
 using System.Collections;
