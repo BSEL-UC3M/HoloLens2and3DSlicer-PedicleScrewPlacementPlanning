@@ -80,9 +80,18 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 					
 		# These connections ensure that whenever user changes some settings on the GUI, that is saved in the MRML scene
 		# (in the selected parameter node).
-		self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+
+		# INPUTS SECTION
+
+		self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onInputVolumeUpdated)
+		# self.ui.inputVolumePath.connect("currentPathChanged(QString)", self.onInputVolumePathUpdated) # This does nothing atm
+		# self.ui.loadInputVolumeButton.connect("clicked(bool)", self.onLoadInputVolumeClicked)
+		self.ui.imageWWSpinBox.connect("valueChanged(double)", self.onWWSpinBoxChanged)
+		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageValuesUpdatedWithSlider)
+		self.ui.imageWLSpinBox.connect("valueChanged(double)", self.onWLSpinBoxChanged)
+
 		self.ui.modelsPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
-		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.updateParameterNodeFromGUI)
+		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageHistogramSlideBarChanged)
 		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
 		self.ui.patientID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 		self.ui.userID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
@@ -92,8 +101,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.ui.saveDataButton.connect("clicked(bool)", self.updateParameterNodeFromGUI)
 
 		# Buttons
-		self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onInputVolumeUpdated)
-		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageValuesUpdatedWithSlider)
 		self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
 		self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
 		self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
@@ -131,6 +138,32 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		"""
 		# Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
 		self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
+
+	def onWWSpinBoxChanged(self, value):
+		"""
+		Updates the WW value in the parameter node
+		"""
+		parameterNode = self.logic.getParameterNode()
+		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(value))
+		self.updateGUIFromParameterNode()
+
+	def onWLSpinBoxChanged(self, value):
+		"""
+		Updates the WL value in the parameter node
+		"""
+		parameterNode = self.logic.getParameterNode()
+		parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(value))
+		self.updateGUIFromParameterNode()
+
+
+	def onImageHistogramSlideBarChanged(self):
+		"""
+		Updates the WW and WL values in the parameter node
+		"""
+		parameterNode = self.logic.getParameterNode()
+		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(self.ui.imageHistogramSlideBar.maximumValue - self.ui.imageHistogramSlideBar.minimumValue))
+		parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str((self.ui.imageHistogramSlideBar.maximumValue + self.ui.imageHistogramSlideBar.minimumValue)/2))
+		self.updateGUIFromParameterNode()
 
 
 	def onSceneStartClose(self, caller, event):
@@ -178,9 +211,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		if not self._parameterNode.GetNodeReference(self.logic.MODELS_DIRECTORY):
 				modelsPath = os.path.join(os.path.dirname(__file__), 'Resources/Models')
 				self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, modelsPath)
-		# if not self._parameterNode.GetNodeReference(self.logic.SAVING_DIRECTORY):
-		# 		savingPath = "C:\temp"
-		# 		self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, savingPath)
 
 	def setParameterNode(self, inputParameterNode):
 		"""
@@ -218,6 +248,17 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# Update node selectors and sliders
 		self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference(self.logic.INPUT_VOLUME))
 		
+		# update the WW and WL spin boxes
+		WL = float(self._parameterNode.GetParameter(self.logic.WINDOW_LEVEL))
+		WW = float(self._parameterNode.GetParameter(self.logic.WINDOW_WIDTH))
+		self.ui.imageWWSpinBox.value = WW
+		self.ui.imageWLSpinBox.value = WL
+		# Update the histogram slide bar
+		minVAL = WL - WW/2
+		maxVAL = WL + WW/2
+		self.ui.imageHistogramSlideBar.minimumValue = minVAL
+		self.ui.imageHistogramSlideBar.maximumValue = maxVAL
+
 		# Update buttons states and tooltips
 		if self._parameterNode.GetNodeReference("InputVolume"):
 				self.ui.createImageSliceButton.toolTip = "Compute output volume"
@@ -248,9 +289,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		wasModified = self._parameterNode.StartModify()  # Modify all properties in a single batch
 
 		self._parameterNode.SetNodeReferenceID(self.logic.INPUT_VOLUME, self.ui.inputSelector.currentNodeID)
-		
-		self.ui.image_WW.value = float(self._parameterNode.GetParameter(self.logic.WINDOW_WIDTH))
-		self.ui.image_WL.value = float(self._parameterNode.GetParameter(self.logic.WINDOW_LEVEL))
 
 		self._parameterNode.SetParameter(self.logic.ACTIVE_SERVER_CHECKBOX, "true" if self.ui.serverActiveCheckBox.checked else "false")
 		self._parameterNode.SetParameter(self.logic.PATIENT_ID, (self.ui.patientID_text).text)
@@ -259,7 +297,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, dirname)
 		self._parameterNode.SetParameter(self.logic.SPINE_FILENAME, spineFileName)
 		
-		# self._parameterNode.SetParameter(self.logic.SAVING_DIRECTORY, self.ui.savingPath.directory)
 		self._parameterNode.EndModify(wasModified)
 
 
@@ -273,10 +310,10 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.ui.imageHistogramSlideBar.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
 		self.ui.imageHistogramSlideBar.maximum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
 		# Set the maximum and minimum values for the WW and WL spin boxes
-		self.ui.image_WW.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))
-		self.ui.image_WW.minimum = 0.0
-		self.ui.image_WL.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))/2
-		self.ui.image_WL.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
+		self.ui.imageWWSpinBox.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))
+		self.ui.imageWWSpinBox.minimum = 0.0
+		self.ui.imageWLSpinBox.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))/2
+		self.ui.imageWLSpinBox.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
 		
 
 
@@ -680,6 +717,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		return node        
 
+	# Alicia function
 	def LoadScrewModelsFromFile(self):
 		"""
 			First, delete preexisting screw models in the scene. Second, parse the screw transforms received from Unity and load the corresponding screw models from the specified folder
