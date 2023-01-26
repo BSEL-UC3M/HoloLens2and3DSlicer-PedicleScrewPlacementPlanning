@@ -1,7 +1,7 @@
 # Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer
 ## Application for pedicle screw placement planning
 
-This repository presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This connection is applied towards pedicle screw placement planning. Here you will find all the necessary information and resources to run the system in your computer. Specifically, we present planning methods for the abovementioned clinical procedure:
+This repository has been created by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid. It presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This connection is applied towards pedicle screw placement planning. Here you will find all the necessary information and resources to run the system in your computer. We present two planning methods for the abovementioned clinical procedure:
 
  - AR method: It couples Microsoft HoloLens 2 to 3D Slicer using OpenIGTLink communication protocol. In the final application, a user can move a plane along a virtual 3D model of a patient’s spine and display the corresponding resliced 2D image from the CT.
 
@@ -31,15 +31,17 @@ For more information, read the README.md file within each folder.
 
 ## General information
  - 3D Slicer version used: 3D Slicer 5.0.3
+   + NOTE: Before proceeding with these modules, please install extensions [SlicerIGT](https://github.com/SlicerIGT/SlicerIGT) and [OpenIGTLink](https://github.com/openigtlink/OpenIGTLink) from the Extensions Manager in 3D Slicer.
  - Unity version used: 2019.3.9f1
+   + NOTE: Some of the libraries and dependencies used in this Unity project may be deprecated / non-existent in other Unity versions. Please, only use version 2019.3.9f1 to run this project.
  - For further questions, please contact apose@ing.uc3m.es
 
 ## Citation
-This repository will complement a paper that is currently under revision for its publication. When it's accepted, the corresponding citation will be updated here. If you find this useful, we kindly ask that you return to this page to check for the updated citation and cite our work in any related publications.
+This repository will complement a paper that is currently under revision for publication. When it's accepted, the corresponding citation will be updated here. If you find this useful, we kindly ask that you return to this page to check for the updated citation and cite our work in any related publications.
 
 
 ## Aknowledgements
- - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity) and [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials). Please, acknowledge their work if you find this repository useful!
+ - Code: This repository borrows code from [OpenIGTLink-Unity](https://github.com/franklinwk/OpenIGTLink-Unity), [ShaderTutorials](https://github.com/ronja-tutorials/ShaderTutorials), and [IGT-UltrARsound](https://github.com/BIIG-UC3M/IGT-UltrARsound). Please, acknowledge their work if you find this repository useful!
 
  - Resources: The patient CT scans used in this repository were retrieved from the [VerSe database](https://github.com/anjany/verse). VerSe has resulted in numerous other publications, including the following:
    + Löffler M, Sekuboyina A, Jakob A, Grau AL, Scharr A, Husseini ME, Herbell M, Zimmer C, Baum T, Kirschke JS. A Vertebral Segmentation Dataset with Fracture Grading. Radiology: Artificial Intelligence, 2020 https://doi.org/10.1148/ryai.2020190138.

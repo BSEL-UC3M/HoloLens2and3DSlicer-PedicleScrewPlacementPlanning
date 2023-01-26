@@ -1,5 +1,5 @@
 ﻿// This code is based on the one provided in: https://github.com/franklinwk/OpenIGTLink-Unity
-// Modified by Alicia Pose, from Universidad Carlos III de Madrid
+// Modified by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 
 using UnityEngine;
 using System;

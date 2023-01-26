@@ -1,4 +1,4 @@
-// This code was developed by Alicia Pose, from Universidad Carlos III de Madrid
+// This code was developed by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 // This script creates all the functions associated to the buttons in canvas.
 // They are mainly used to Save all the models information in a json file in the local storage of the computer, to load it back later.
 // Example of json's structure:

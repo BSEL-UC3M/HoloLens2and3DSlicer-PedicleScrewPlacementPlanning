@@ -1,4 +1,4 @@
-// This code was developed by Alicia Pose, from Universidad Carlos III de Madrid
+// This code was developed by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid
 // This script creates all the functions associated to the switch buttons in the ControlPanel
 
 // First, import some libraries of interest
