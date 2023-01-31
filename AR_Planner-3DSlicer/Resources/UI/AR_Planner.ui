@@ -228,7 +228,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="16" column="1">
-       <widget class="ctkDirectoryButton" name="DirectoryButton"/>
+       <widget class="ctkDirectoryButton" name="screwDirButton"/>
       </item>
      </layout>
     </widget>

@@ -83,30 +83,32 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# These connections ensure that whenever user changes some settings on the GUI, that is saved in the MRML scene
 		# (in the selected parameter node).
 
-		# INPUTS SECTION
+		### INPUTS SECTION
 
 		self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onInputVolumeUpdated)
 		# self.ui.inputVolumePath.connect("currentPathChanged(QString)", self.onInputVolumePathUpdated) # This does nothing atm
 		# self.ui.loadInputVolumeButton.connect("clicked(bool)", self.onLoadInputVolumeClicked)
+
 		self.ui.imageWWSpinBox.connect("valueChanged(double)", self.onWWSpinBoxChanged)
-		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageValuesUpdatedWithSlider)
+		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageHistogramSlideBarChanged)
 		self.ui.imageWLSpinBox.connect("valueChanged(double)", self.onWLSpinBoxChanged)
+		self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
 
 		self.ui.modelsPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
-		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageHistogramSlideBarChanged)
-		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
+		self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
+
+
+        #### OpenIGTLink Connection SECTION
+		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
+
+		### Update screws SECTION
+		# self.ui.screwDirButton.connect('clicked(bool)', self.onScrewDirButtonClicked)
+		self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
+
+		### SAVE SECTION
+		self.ui.savingPath.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
 		self.ui.patientID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
 		self.ui.userID_text.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
-
-		self.ui.savingPath.connect('directorySelected(QString)', self.onSaveDirectoryChanged)
-
-		self.ui.saveDataButton.connect("clicked(bool)", self.updateParameterNodeFromGUI)
-
-		# Buttons
-		self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
-		self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
-		self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
-		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked) #**
 		self.ui.saveDataButton.connect('clicked(bool)', self.onSaveDataClicked)
 
 		# Make sure parameter node is initialized (needed for module reload)
@@ -141,6 +143,22 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
 		self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
 
+	def onSceneStartClose(self, caller, event):
+			"""
+			Called just before the scene is closed.
+			"""
+			# Parameter node will be reset, do not use it anymore
+			self.setParameterNode(None)
+
+	def onSceneEndClose(self, caller, event):
+		"""
+		Called just after the scene is closed.
+		"""
+		# If this module is shown while the scene is closed then recreate a new parameter node immediately
+		if self.parent.isEntered:
+				self.initializeParameterNode()
+
+
 	def onWWSpinBoxChanged(self, value):
 		"""
 		Updates the WW value in the parameter node
@@ -148,6 +166,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		parameterNode = self.logic.getParameterNode()
 		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(value))
 		self.updateGUIFromParameterNode()
+		self.logic.UpdateImageValuesWithSlider()
 
 	def onWLSpinBoxChanged(self, value):
 		"""
@@ -156,7 +175,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		parameterNode = self.logic.getParameterNode()
 		parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(value))
 		self.updateGUIFromParameterNode()
-
+		self.logic.UpdateImageValuesWithSlider()
 
 	def onImageHistogramSlideBarChanged(self):
 		"""
@@ -166,22 +185,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(self.ui.imageHistogramSlideBar.maximumValue - self.ui.imageHistogramSlideBar.minimumValue))
 		parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str((self.ui.imageHistogramSlideBar.maximumValue + self.ui.imageHistogramSlideBar.minimumValue)/2))
 		self.updateGUIFromParameterNode()
-
-
-	def onSceneStartClose(self, caller, event):
-		"""
-		Called just before the scene is closed.
-		"""
-		# Parameter node will be reset, do not use it anymore
-		self.setParameterNode(None)
-
-	def onSceneEndClose(self, caller, event):
-		"""
-		Called just after the scene is closed.
-		"""
-		# If this module is shown while the scene is closed then recreate a new parameter node immediately
-		if self.parent.isEntered:
-				self.initializeParameterNode()
+		self.logic.UpdateImageValuesWithSlider()
 
 	def initializeParameterNode(self):
 		"""
@@ -301,7 +305,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		
 		self._parameterNode.EndModify(wasModified)
 
-
 	def onInputVolumeUpdated(self):
 		"""
 			This method is called when the user changes the input volume
@@ -312,21 +315,16 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.ui.imageHistogramSlideBar.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
 		self.ui.imageHistogramSlideBar.maximum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
 		# Set the maximum and minimum values for the WW and WL spin boxes
-		self.ui.imageWWSpinBox.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))
+		maxWidth = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
 		self.ui.imageWWSpinBox.minimum = 0.0
-		self.ui.imageWLSpinBox.maximum = float(float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit)))/2
-		self.ui.imageWLSpinBox.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
-		
-
-
-	def onImageValuesUpdatedWithSlider(self, lower, upper):
-		"""
-			This method is called when the user employs the double range slide bar to manipulate the image visualization
-		"""
-		self.updateParameterNodeFromGUI()
-		self.logic.UpdateImageValuesWithSlider(lower, upper)
-
-	
+		self.ui.imageWWSpinBox.maximum = maxWidth
+		minLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
+		maxLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
+		self.ui.imageWLSpinBox.maximum = maxLevel
+		self.ui.imageWLSpinBox.minimum = minLevel
+		# update the window level to be zero and the width to be half the maximum in the parameter node
+		self._parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(0))
+		self._parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(0.5*maxWidth))
 
 	def onCreateImageSliceClicked(self):
 		"""
@@ -338,7 +336,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			self.logic.CreateImageSlice()
 
 			self.ui.InputImageCollapsibleButton.collapsed = True
-
 
 	def onLoadSpineModelFromFileClicked(self):
 		"""
@@ -370,7 +367,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.updateParameterNodeFromGUI()
 		self.logic.LoadScrewModelsFromFile()
 
-	
 	def onActivateOpenIGTLinkConnectionClicked(self, connect):
 		"""
 		Run processing when user clicks on the OpenIGTLink checkbox.
@@ -388,7 +384,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 				self.connect = True # set connect variable to true
 				self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - INACTIVE" # Update displaying text
 				
-
 	def onSaveDirectoryChanged(self, directory):
 		"""
 		Run processing when user selects a new saving location.
@@ -409,10 +404,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 				save_folder_path = self.logic.SaveData()
 				self.ui.filesSavedLabel.setText("All files have been saved in:\n" + save_folder_path)
 			             
-
-
-
-
 #
 # AR_PlannerLogic
 #
@@ -446,9 +437,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 	# Parameters
 	CT_RESLICE_OUTPUT = 'CT_reslice'
 
-
-
-
 	def __init__(self):
 		"""
 		Called when the logic class is instantiated. Can be used for initializing member variables.
@@ -459,10 +447,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		"""
 		Initialize parameter node with default settings.
 		"""
-		if not parameterNode.GetParameter(self.WINDOW_WIDTH):
-				parameterNode.SetParameter(self.WINDOW_WIDTH, "0")
-		if not parameterNode.GetParameter(self.WINDOW_LEVEL):
-				parameterNode.SetParameter(self.WINDOW_LEVEL, "0")
 		if not parameterNode.GetParameter(self.ACTIVE_SERVER_CHECKBOX):
 				parameterNode.SetParameter(self.ACTIVE_SERVER_CHECKBOX, "0")
 
@@ -472,59 +456,44 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		"""
 		parameterNode = self.getParameterNode()
 		inputVolume = parameterNode.GetNodeReference(self.INPUT_VOLUME)
-		
+		# if the volume is not loaded, set the hist slidebar to 
+		if inputVolume is None:
+			return
+		# get the image array
 		imageArray = slicer.util.arrayFromVolume(inputVolume)
-		minValue = imageArray.min()
-		maxValue = imageArray.max()
-
+		# get the min and max values of the image array
+		minValue = int(imageArray.min())
+		maxValue = int(imageArray.max())
+		# set the min and max values in the parameter node
 		parameterNode.SetParameter(self.IMAGE_HIST_SLIDEBAR_minLimit, str(minValue))
 		parameterNode.SetParameter(self.IMAGE_HIST_SLIDEBAR_maxLimit, str(maxValue))			
 
-	def UpdateImageValuesWithSlider(self, lower, upper):
+	def UpdateImageValuesWithSlider(self):
 		"""
 		Update the window width and window level of the image according to the slider.
 		"""
 		parameterNode = self.getParameterNode()
+		# Get the CT volume we want to modify
 		inputVolume = parameterNode.GetNodeReference(self.INPUT_VOLUME)
-		
+		# if the volume is not loaded, return
+		if inputVolume is None:
+			return
+		# Get the display node of the CT volume
 		displayNode = inputVolume.GetDisplayNode()
-		windowWidth = upper - lower
-		windowLevel = lower+(windowWidth/2)
 
-		displayNode.SetWindow(windowWidth)
-		displayNode.SetLevel(windowLevel)
-		
-		parameterNode.SetParameter(self.WINDOW_WIDTH, str(windowWidth))
-		parameterNode.SetParameter(self.WINDOW_LEVEL, str(windowLevel))
+		# Get the window width and window level from the parameter node
+		ww = float(parameterNode.GetParameter(self.WINDOW_WIDTH))
+		wl = float(parameterNode.GetParameter(self.WINDOW_LEVEL))
+		# Allow us to change the window width and window level manually
+		displayNode.AutoWindowLevelOff()
+		# Update the display node
+		displayNode.SetWindow(ww)
+		displayNode.SetLevel(wl)
 
-	# Added by Alicia
-	def UpdateWWvalue(self, ww_value):
-		"""
-		Update Window width according to the WW spinbox content.
-		"""
-		parameterNode = self.getParameterNode()
+		# update the parameter node
+		parameterNode.SetParameter(self.WINDOW_WIDTH, str(ww))
+		parameterNode.SetParameter(self.WINDOW_LEVEL, str(wl))
 
-		inputVolume = parameterNode.GetNodeReference(self.INPUT_VOLUME)        
-		displayNode = inputVolume.GetDisplayNode()
-		displayNode.SetWindow(ww_value)
-		print(ww_value)
-
-		parameterNode.SetParameter(self.WINDOW_WIDTH, str(ww_value))
-
-	# Added by Alicia
-	def UpdateWLvalue(self, wl_value):
-		"""
-		Update Window level according to the WW spinbox content.
-		"""
-		parameterNode = self.getParameterNode()
-
-		inputVolume = parameterNode.GetNodeReference(self.INPUT_VOLUME)        
-		displayNode = inputVolume.GetDisplayNode()
-		displayNode.SetLevel(wl_value)
-
-		parameterNode.SetParameter(self.WINDOW_LEVEL, str(wl_value))
-
-		
 	def CreateImageSlice(self):
 		"""
 		Create an image reslice.
