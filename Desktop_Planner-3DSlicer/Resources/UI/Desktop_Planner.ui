@@ -36,7 +36,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="qMRMLNodeComboBox" name="spineModelComboBox">
+       <widget class="qMRMLNodeComboBox" name="spineModelSelector">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -57,7 +57,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="qMRMLNodeComboBox" name="inputVolumeComboBox">
+       <widget class="qMRMLNodeComboBox" name="inputSelector">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -87,7 +87,7 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="2" column="3">
-       <widget class="ctkPathLineEdit" name="PathLineEdit_2"/>
+       <widget class="ctkPathLineEdit" name="spineModelPath"/>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_6">
@@ -97,17 +97,17 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="ctkPathLineEdit" name="PathLineEdit"/>
+       <widget class="ctkPathLineEdit" name="inputVolumePath"/>
       </item>
       <item row="1" column="4">
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="loadInputVolumeButton">
         <property name="text">
          <string>Load volume</string>
         </property>
        </widget>
       </item>
       <item row="2" column="4">
-       <widget class="QPushButton" name="loadSpineButton">
+       <widget class="QPushButton" name="loadSpineModelButton">
         <property name="text">
          <string>Load spine</string>
         </property>
@@ -128,50 +128,14 @@ p, li { white-space: pre-wrap; }
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Screw Diameter: </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="screwDiameterBox">
-        <property name="currentText">
-         <string>4.5</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>4.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>6</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-      <item row="0" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
          <string>Screw length: </string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="loadScrewButton">
-        <property name="text">
-         <string>Load screw model</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
+      <item row="3" column="1">
        <widget class="QComboBox" name="screwLengthBox">
         <property name="currentText">
          <string>30</string>
@@ -211,6 +175,52 @@ p, li { white-space: pre-wrap; }
           <string>60</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="screwDiameterBox">
+        <property name="currentText">
+         <string>4.5</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>4.5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>5</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>6</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="loadScrewButton">
+        <property name="text">
+         <string>Load screw model</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Screw Diameter: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="ctkDirectoryButton" name="ScrewModelDirButton"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Screws Location: </string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -647,7 +657,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>SpineGuidanceStudyModule</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>inputVolumeComboBox</receiver>
+   <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -679,7 +689,7 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>SpineGuidanceStudyModule</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>spineModelComboBox</receiver>
+   <receiver>spineModelSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">

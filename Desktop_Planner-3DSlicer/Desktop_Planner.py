@@ -83,14 +83,19 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # (in the selected parameter node).
     
     # VOLUME SELECTION
-    self.ui.inputVolumeComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onInputVolumeSelected)
+    self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onInputVolumeSelected)
+    self.ui.inputVolumePath.connect("currentPathChanged(QString)", self.onInputVolumePathSelected)
+    self.ui.loadInputVolumeButton.connect("clicked(bool)", self.onLoadInputVolumeClicked)
 
     # SPINE SELECTION
-    self.ui.spineModelComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onSpineModelSelected)
-    self.ui.loadScrewButton.connect('clicked(bool)', self.onLoadSpineButtonClicked)
+    
+    self.ui.spineModelSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onSpineModelSelected)
+    self.ui.spineModelPath.connect('currentPathChanged(QString)', self.onSpineModelPathSelected)
+    self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelButtonClicked)
     
     # SCREW SELECTION
     # The screw length and diameter are initizalied in the wigit viewer directly
+    self.ui.ScrewModelDirButton.connect('directoryChanged(QString)', self.onScrewModelDirSelected)
     self.ui.loadScrewButton.connect('clicked(bool)', self.onLoadScrewButtonClicked)
     self.ui.screwTransformComboBox.connect('currentNodeChanged(vtkMRMLNode*)', self.onScrewTransformSelected)
 
@@ -136,6 +141,16 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     settings = slicer.app.userSettings()
     if settings.value(self.logic.RESULTS_SAVE_DIRECTORY_SETTING): # if the settings exists
       self.ui.saveDirectoryButton.directory = settings.value(self.logic.RESULTS_SAVE_DIRECTORY_SETTING)
+    # repeat for input volume path
+    if settings.value(self.logic.INPUT_VOLUME_PATH):
+      self.ui.inputVolumePath.setCurrentPath(settings.value(self.logic.INPUT_VOLUME_PATH))
+    # repeat for spine model path
+    if settings.value(self.logic.SPINE_MODEL_PATH):
+      self.ui.spineModelPath.setCurrentPath(settings.value(self.logic.SPINE_MODEL_PATH))
+    # repeat for screw model path
+    if settings.value(self.logic.SCREW_MODEL_PATH):
+      self.ui.ScrewModelDirButton.directory = settings.value(self.logic.SCREW_MODEL_PATH)
+
 
   def setupCustomLayout(self):
     customLayout = \
@@ -157,8 +172,7 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # for your custom layout ID.
     layoutManager = slicer.app.layoutManager()
     layoutManager.layoutLogic().GetLayoutNode().AddLayoutDescription(self.LAYOUT_DUAL3D, customLayout)
-
-  
+ 
   def onSceneStartClose(self, caller, event):
     """
     Called just before the scene is closed.
@@ -166,7 +180,6 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     # Parameter node will be reset, do not use it anymore
     self.setParameterNode(None)
     
-
   def onSceneEndClose(self, caller, event):
     """
     Called just after the scene is closed.
@@ -217,10 +230,10 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     # Update widgets from parameter node
 
-    currentInputVolume = self.ui.inputVolumeComboBox.currentNode()
+    currentInputVolume = self.ui.inputSelector.currentNode()
     referencedVolume = self._parameterNode.GetNodeReference(self.logic.CURRENT_INPUT_VOLUME)
     if currentInputVolume != referencedVolume:
-      self.ui.inputVolumeComboBox.setCurrentNode(referencedVolume)
+      self.ui.inputSelector.setCurrentNode(referencedVolume)
 
     currentScrewTransform = self.ui.screwTransformComboBox.currentNode()
     referencedTransform = self._parameterNode.GetNodeReference(self.logic.SCREW_TO_RAS_TRANSFORM)
@@ -276,6 +289,32 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     self._parameterNode.EndModify(wasModified)
 
+  #
+  # UI fuctions
+  #
+
+  def onInputVolumePathSelected(self, path):
+    '''
+    Updates the input volume path in the settings
+    '''
+    settings = slicer.app.userSettings()
+    settings.setValue(self.logic.INPUT_VOLUME_PATH, path)
+    # enable the button	
+    self.ui.loadInputVolumeButton.enabled = True
+
+  def onLoadInputVolumeClicked(self):
+    '''
+    Loads the input volume from the path
+    '''
+    # Get the path from the GUI
+    path = self.ui.inputVolumePath.currentPath
+    # Get the volume name from the path
+    filename = os.path.splitext(os.path.basename(path))[0]
+    # Load the volume
+    volumeNode = slicer.util.loadVolume(path)
+    # Set the volume as the input volume
+    self.ui.inputSelector.setCurrentNode(volumeNode)
+
   def onInputVolumeSelected(self, selectedNode):
     """
     This method is called when the user selects a new input volume
@@ -295,6 +334,7 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
     self.updateWidgetsForCurrentVolume()
 
+
   def onSpineModelSelected(self, selectedNode):
     """
     This method is called when the user selects a new spine model
@@ -307,24 +347,47 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     else:
       self._parameterNode.SetNodeReferenceID(self.logic.SPINE_MODEL, selectedNode.GetID())
 
-  def onLoadSpineButtonClicked(self):
+  def onSpineModelPathSelected(self, path):
     '''
-    This method is called "Load spine" button is clicked
+    Updates the spine model path in the settings
     '''
-    pass
+    settings = slicer.app.userSettings()
+    settings.setValue(self.logic.SPINE_MODEL_PATH, path)
+    # enable the button	
+    self.ui.loadSpineModelButton.enabled = True
+
+  def onLoadSpineModelButtonClicked(self):
+    '''
+    Loads the spine model from the path
+    '''
+    # Get the path from the GUI
+    path = self.ui.spineModelPath.currentPath
+    # Load the volume
+    modelNode = slicer.util.loadModel(path)
+    # Set the volume as the input volume
+    self.ui.spineModelSelector.setCurrentNode(modelNode)
+    # disable the button
+    self.ui.loadSpineModelButton.enabled = False
+    
+  def onScrewModelDirSelected(self, path):
+    '''
+    Updates the screw model directory in the settings
+    '''
+    settings = slicer.app.userSettings()
+    settings.setValue(self.logic.SCREW_MODEL_PATH, path)
+    # enable the button	
+    self.ui.loadScrewButton.enabled = True
 
   def onLoadScrewButtonClicked(self):
     '''
     This method is called "Load screw model" button is clicked
     '''
     self.updateParameterNodeFromGUI()
-    # screwName = self.ui.modelNameBox.currentText
     # Get the screw name from the length and diameter boxes instead
     screwLength = self.ui.screwLengthBox.currentText
     screwDiameter = self.ui.screwDiameterBox.currentText
     # If D = 5 and L = 30, then screwName = D5L30
     screwName = "D" + screwDiameter + "L" + screwLength
-    #screwTransformName = self.ui.screwTransformComboBox.currentNode().GetName()
     self.screwNumber = self.screwNumber + 1
     screwTransformName = "Screw-" + str(self.screwNumber) + "_T"
     screwNode = self.logic.LoadScrewModel(screwName, screwTransformName)
@@ -332,7 +395,6 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     self.ui.screwTransformComboBox.setCurrentNode(screwTransformNode)
     # set the screw parameters as an attribute of the model
     screwNode.SetAttribute("ScrewNumber", screwName)
-
 
   def onScrewTransformSelected(self, selectedNode):
     '''
@@ -412,25 +474,25 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     '''
     This method is called when the "In 1 mm" button is clicked
     '''
-    self.logic.moveScrewIn(1)
+    self.logic.moveScrewIn(-1)
 
   def onInLargeButton(self):
     '''
     This method is called when the "In 10 mm" button is clicked
     '''
-    self.logic.moveScrewIn(10)
+    self.logic.moveScrewIn(-10)
 
   def onOutButton(self):
     '''
     This method is called when the "Out 1 mm" button is clicked
     '''
-    self.logic.moveScrewIn(-1)
+    self.logic.moveScrewIn(1)
 
   def onOutLargeButton(self):
     '''
     This method is called when the "Out 10 mm" button is clicked
     '''
-    self.logic.moveScrewIn(-10)
+    self.logic.moveScrewIn(10)
 
   # Rotation
   def onCranialRotationButton(self):
@@ -537,6 +599,10 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
   ROTATE_R = "RotateR"
   ROTATE_S = "RotateS"
 
+  INPUT_VOLUME_PATH = 'Desktop_Planner/InputVolumePath'
+  SPINE_MODEL_PATH = 'Desktop_Planner/SpineModelPath'
+  SPINE_MODEL = 'SpineModel'
+  SCREW_MODEL_PATH = 'Desktop_Planner/ScrewModelPath'
   RESULTS_SAVE_DIRECTORY_SETTING = 'Desktop_Planner/ResultsSaveDirectory'
   USER_ID = "UserID"
   PATIENT_ID = "PatientID"
@@ -571,9 +637,6 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
       parameterNode.SetParameter(self.ROTATE_S, "0")
     pass
 
-  def process(self, inputVolume, outputVolume, imageThreshold, invert=False, showResult=True): ######################################################################################## DO WE NEED THIS???
-    pass
-
   def setupScene(self):
     """
     Set up the scene
@@ -590,12 +653,6 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     t90Node.SetName("RotationT")
     slicer.mrmlScene.AddNode(t90Node)
 
-  def previousScene(self): ################################################################################################################################################################ DO WE NEED THIS?
-    pass
-
-  def nextScene(self): ################################################################################################################################################################ DO WE NEED THIS?
-    pass
-
   def updateTransformFromParameterNode(self):
     """
     Update the transform from the parameter node
@@ -608,7 +665,7 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     screwToRasTransform.Translate(float(parameterNode.GetParameter(self.TRANSLATE_R)),
                                    float(parameterNode.GetParameter(self.TRANSLATE_A)),
                                    float(parameterNode.GetParameter(self.TRANSLATE_S)))
-    screwToRasTransform.RotateX(float(parameterNode.GetParameter(self.ROTATE_R)) - 90)  # Start at anterior direction
+    screwToRasTransform.RotateX(float(parameterNode.GetParameter(self.ROTATE_R)) )  # Start at anterior direction
     screwToRasTransform.RotateY(float(parameterNode.GetParameter(self.ROTATE_S)))
 
     # Set the transform to the transform node
@@ -698,7 +755,6 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     # Save the current scene to saveDirectory with fileName
     slicer.util.saveScene(os.path.join(saveDirectory, fileName))
 
-
   def LoadScrewModel(self, screwFileNameWOExt, transformName):
     """
     Load the screw "screwFileNameWOExt" model from the specified directory and apply the transform "transformName" to it
@@ -724,17 +780,15 @@ class Desktop_PlannerLogic(ScriptedLoadableModuleLogic):
     screwNode.GetModelDisplayNode().SetSliceIntersectionVisibility(True)
     return screwNode
 
-
   def LoadModelFromFile(self, modelFileName, colorRGB_array, visibility_bool):
     """
 		Load the model "modelFileName" from the specified folder. Set its color to colorRGB_array and enable its visibility according to visibility_bool
 		"""
-    parameterNode = self.getParameterNode()
-    modelFilePath = os.path.join(os.path.dirname(__file__), 'Resources/Models')
-    
+    # get the path fro msettings 
+    settings = slicer.app.userSettings()
+    modelFilePath = settings.value(self.SCREW_MODEL_PATH)
     try:
       node = slicer.util.getNode(modelFileName)
-    
     except:
         node = slicer.util.loadModel(os.path.join(modelFilePath, modelFileName))
         node.GetModelDisplayNode().SetColor(colorRGB_array)
