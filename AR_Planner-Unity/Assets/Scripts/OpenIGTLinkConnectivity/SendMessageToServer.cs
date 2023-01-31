@@ -49,6 +49,9 @@ public class SendMessageToServer : MonoBehaviour
         
         // Define Header in hexadecimal
         string deviceName = modelName + "_T";
+
+        // Define the version in hexadecimal
+        string oigtlVersion = "0002";
         
         
         // Elements of the matrix
@@ -260,7 +263,7 @@ public class SendMessageToServer : MonoBehaviour
         //string deviceName = "Screw-" + myScrew._number + "_T";
         string timeStamp = BitConverter.ToString(BitConverter.GetBytes(Convert.ToUInt64(0))).Replace("-", "");
         string bodySize = ((hexExtHeader + body + hexMetaBody).Length / 2).ToString("X16");
-        string hexHeader = "0002" + StringToHexString("TRANSFORM", 12) + StringToHexString(deviceName, 20) + timeStamp + bodySize;
+        string hexHeader = oigtlVersion + StringToHexString("TRANSFORM", 12) + StringToHexString(deviceName, 20) + timeStamp + bodySize;
 
         // Calculate CRC
         // Obtain the CRC associated to this message

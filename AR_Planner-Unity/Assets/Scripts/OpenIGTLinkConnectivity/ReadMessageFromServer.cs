@@ -137,178 +137,111 @@ public class ReadMessageFromServer
     public static ImageInfo ReadImageInfo(byte[] iMSGbyteArrayComplete, uint headerSize, UInt16 extHeaderSize_iMSG)
     {
         // Define the variables stored in the body of the message
-        byte[] bodyArray_Version = new byte[2];
-        byte[] bodyArray_ImComp = new byte[1];
-        byte[] bodyArray_ScalarType = new byte[1];
-        byte[] bodyArray_Endian = new byte[1];
-        byte[] bodyArray_ImCoord = new byte[1];
-        byte[] bodyArray_NumPixX = new byte[2];
-        byte[] bodyArray_NumPixY = new byte[2];
-        byte[] bodyArray_NumPixZ = new byte[2];
-        byte[] bodyArray_Xi = new byte[4];
-        byte[] bodyArray_Yi = new byte[4];
-        byte[] bodyArray_Zi = new byte[4];
-        byte[] bodyArray_Xj = new byte[4];
-        byte[] bodyArray_Yj = new byte[4];
-        byte[] bodyArray_Zj = new byte[4];
-        byte[] bodyArray_Xk = new byte[4];
-        byte[] bodyArray_Yk = new byte[4];
-        byte[] bodyArray_Zk = new byte[4];
-        byte[] bodyArray_CenterPosX = new byte[4];
-        byte[] bodyArray_CenterPosY = new byte[4];
-        byte[] bodyArray_CenterPosZ = new byte[4];
-        byte[] bodyArray_StartingIndexSVX = new byte[2];
-        byte[] bodyArray_StartingIndexSVY = new byte[2];
-        byte[] bodyArray_StartingIndexSVZ = new byte[2];
-        byte[] bodyArray_NumPixSVX = new byte[2];
-        byte[] bodyArray_NumPixSVY = new byte[2];
-        byte[] bodyArray_NumPixSVZ = new byte[2];
-
-        // Define the offset to skip in the reader to reach the next variable (SP = starting point)
-        int version_SP = (int)headerSize + (int)extHeaderSize_iMSG;
-        int imComp_SP = version_SP + bodyArray_Version.Length;
-        int scalarType_SP = imComp_SP + bodyArray_ImComp.Length;
-        int endian_SP = scalarType_SP + bodyArray_ScalarType.Length;
-        int imCoord_SP = endian_SP + bodyArray_Endian.Length;
-        int numPixX_SP = imCoord_SP + bodyArray_ImCoord.Length;
-        int numPixY_SP = numPixX_SP + bodyArray_NumPixX.Length;
-        int numPixZ_SP = numPixY_SP + bodyArray_NumPixY.Length;
-        int xi_SP = numPixZ_SP + bodyArray_NumPixZ.Length;
-        int yi_SP = xi_SP + bodyArray_Xi.Length;
-        int zi_SP = yi_SP + bodyArray_Yi.Length;
-        int xj_SP = zi_SP + bodyArray_Zi.Length;
-        int yj_SP = xj_SP + bodyArray_Xj.Length;
-        int zj_SP = yj_SP + bodyArray_Yj.Length;
-        int xk_SP = zj_SP + bodyArray_Zj.Length;
-        int yk_SP = xk_SP + bodyArray_Xk.Length;
-        int zk_SP = yk_SP + bodyArray_Yk.Length;
-        int centerPosX_SP = zk_SP + bodyArray_Zk.Length;
-        int centerPosY_SP = centerPosX_SP + bodyArray_CenterPosX.Length;
-        int centerPosZ_SP = centerPosY_SP + bodyArray_CenterPosY.Length;
-        int startingIndexSVX_SP = centerPosZ_SP + bodyArray_CenterPosZ.Length;
-        int startingIndexSVY_SP = startingIndexSVX_SP + bodyArray_StartingIndexSVX.Length;
-        int startingIndexSVZ_SP = startingIndexSVY_SP + bodyArray_StartingIndexSVY.Length;
-        int numPixSVX_SP = startingIndexSVZ_SP + bodyArray_StartingIndexSVZ.Length;
-        int numPixSVY_SP = numPixSVX_SP + bodyArray_NumPixSVX.Length;
-        int numPixSVZ_SP = numPixSVY_SP + bodyArray_NumPixSVY.Length;
-
-
-        // Store the information into the variables
-        Buffer.BlockCopy(iMSGbyteArrayComplete, version_SP, bodyArray_Version, 0, bodyArray_Version.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, imComp_SP, bodyArray_ImComp, 0, bodyArray_ImComp.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, scalarType_SP, bodyArray_ScalarType, 0, bodyArray_ScalarType.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, endian_SP, bodyArray_Endian, 0, bodyArray_Endian.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, imCoord_SP, bodyArray_ImCoord, 0, bodyArray_ImCoord.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixX_SP, bodyArray_NumPixX, 0, bodyArray_NumPixX.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixY_SP, bodyArray_NumPixY, 0, bodyArray_NumPixY.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixZ_SP, bodyArray_NumPixZ, 0, bodyArray_NumPixZ.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, xi_SP, bodyArray_Xi, 0, bodyArray_Xi.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, yi_SP, bodyArray_Yi, 0, bodyArray_Yi.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, zi_SP, bodyArray_Zi, 0, bodyArray_Zi.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, xj_SP, bodyArray_Xj, 0, bodyArray_Xj.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, yj_SP, bodyArray_Yj, 0, bodyArray_Yj.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, zj_SP, bodyArray_Zj, 0, bodyArray_Zj.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, xk_SP, bodyArray_Xk, 0, bodyArray_Xk.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, yk_SP, bodyArray_Yk, 0, bodyArray_Yk.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, zk_SP, bodyArray_Zk, 0, bodyArray_Zk.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, centerPosX_SP, bodyArray_CenterPosX, 0, bodyArray_CenterPosX.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, centerPosY_SP, bodyArray_CenterPosY, 0, bodyArray_CenterPosY.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, centerPosZ_SP, bodyArray_CenterPosZ, 0, bodyArray_CenterPosZ.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, startingIndexSVX_SP, bodyArray_StartingIndexSVX, 0, bodyArray_StartingIndexSVX.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, startingIndexSVY_SP, bodyArray_StartingIndexSVY, 0, bodyArray_StartingIndexSVY.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, startingIndexSVZ_SP, bodyArray_StartingIndexSVZ, 0, bodyArray_StartingIndexSVZ.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixSVX_SP, bodyArray_NumPixSVX, 0, bodyArray_NumPixSVX.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixSVY_SP, bodyArray_NumPixSVY, 0, bodyArray_NumPixSVY.Length);
-        Buffer.BlockCopy(iMSGbyteArrayComplete, numPixSVZ_SP, bodyArray_NumPixSVZ, 0, bodyArray_NumPixSVZ.Length);
-
-        int offsetBeforeImageContent = numPixSVZ_SP + bodyArray_NumPixSVZ.Length;
-
-        // If the message is Little Endiant, reverse the contents of the arrays
-        if (BitConverter.IsLittleEndian)
-        {
-            Array.Reverse(bodyArray_Version);
-            Array.Reverse(bodyArray_ImComp);
-            Array.Reverse(bodyArray_ScalarType);
-            Array.Reverse(bodyArray_Endian);
-            Array.Reverse(bodyArray_ImCoord);
-            Array.Reverse(bodyArray_NumPixX);
-            Array.Reverse(bodyArray_NumPixY);
-            Array.Reverse(bodyArray_NumPixZ);
-            Array.Reverse(bodyArray_Xi);
-            Array.Reverse(bodyArray_Yi);
-            Array.Reverse(bodyArray_Zi);
-            Array.Reverse(bodyArray_Xj);
-            Array.Reverse(bodyArray_Yj);
-            Array.Reverse(bodyArray_Zj);
-            Array.Reverse(bodyArray_Xk);
-            Array.Reverse(bodyArray_Yk);
-            Array.Reverse(bodyArray_Zk);
-            Array.Reverse(bodyArray_CenterPosX);
-            Array.Reverse(bodyArray_CenterPosY);
-            Array.Reverse(bodyArray_CenterPosZ);
-            Array.Reverse(bodyArray_StartingIndexSVX);
-            Array.Reverse(bodyArray_StartingIndexSVY);
-            Array.Reverse(bodyArray_StartingIndexSVZ);
-            Array.Reverse(bodyArray_NumPixSVX);
-            Array.Reverse(bodyArray_NumPixSVY);
-            Array.Reverse(bodyArray_NumPixSVZ);
-        }
-
-        // Translate the byte arrays into the appropriate data types
-        UInt16 versionNumber_bodyIm = BitConverter.ToUInt16(bodyArray_Version);
-        UInt16 numPixX_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixX);
-        UInt16 numPixY_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixY);
-        UInt16 numPixZ_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixZ);
-        float xi_bodyIm = BitConverter.ToSingle(bodyArray_Xi);
-        float yi_bodyIm = BitConverter.ToSingle(bodyArray_Yi);
-        float zi_bodyIm = BitConverter.ToSingle(bodyArray_Zi);
-        float xj_bodyIm = BitConverter.ToSingle(bodyArray_Xj);
-        float yj_bodyIm = BitConverter.ToSingle(bodyArray_Yj);
-        float zj_bodyIm = BitConverter.ToSingle(bodyArray_Zj);
-        float xk_bodyIm = BitConverter.ToSingle(bodyArray_Xk);
-        float yk_bodyIm = BitConverter.ToSingle(bodyArray_Yk);
-        float zk_bodyIm = BitConverter.ToSingle(bodyArray_Zk);
-        float centerPosX_bodyIm = BitConverter.ToSingle(bodyArray_CenterPosX);
-        float centerPosY_bodyIm = BitConverter.ToSingle(bodyArray_CenterPosY);
-        float centerPosZ_bodyIm = BitConverter.ToSingle(bodyArray_CenterPosZ);
-        UInt16 startingIndexSVX_bodyIm = BitConverter.ToUInt16(bodyArray_StartingIndexSVX);
-        UInt16 startingIndexSVY_bodyIm = BitConverter.ToUInt16(bodyArray_StartingIndexSVY);
-        UInt16 startingIndexSVZ_bodyIm = BitConverter.ToUInt16(bodyArray_StartingIndexSVZ);
-        UInt16 numPixSVX_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixSVX);
-        UInt16 numPixSVY_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixSVY);
-        UInt16 numPixSVZ_bodyIm = BitConverter.ToUInt16(bodyArray_NumPixSVZ);
-
+        int[] bodyArrayLengths = new int[]{2, 1, 1, 1, 1, 2, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2};
         
-        // Store all this values in the ImageInfo structure
         ImageInfo incomingImageInfo = new ImageInfo();
-        incomingImageInfo.versionNumber = versionNumber_bodyIm;
-        incomingImageInfo.imComp = bodyArray_ImComp[0];
-        incomingImageInfo.scalarType = bodyArray_ScalarType[0];
-        incomingImageInfo.endian = bodyArray_Endian[0];
-        incomingImageInfo.imCoord = bodyArray_ImCoord[0];
-        incomingImageInfo.numPixX = numPixX_bodyIm;
-        incomingImageInfo.numPixY = numPixY_bodyIm;
-        incomingImageInfo.numPixZ = numPixZ_bodyIm;
-        incomingImageInfo.xi = xi_bodyIm;
-        incomingImageInfo.yi = yi_bodyIm;
-        incomingImageInfo.zi = zi_bodyIm;
-        incomingImageInfo.xj = xj_bodyIm;
-        incomingImageInfo.yj = yj_bodyIm;
-        incomingImageInfo.zj = zj_bodyIm;
-        incomingImageInfo.xk = xk_bodyIm;
-        incomingImageInfo.yk = yk_bodyIm;
-        incomingImageInfo.zk = zk_bodyIm;
-        incomingImageInfo.centerPosX = centerPosX_bodyIm;
-        incomingImageInfo.centerPosY = centerPosY_bodyIm;
-        incomingImageInfo.centerPosZ = centerPosZ_bodyIm;
-        incomingImageInfo.startingIndexSVX = startingIndexSVX_bodyIm;
-        incomingImageInfo.startingIndexSVY = startingIndexSVY_bodyIm;
-        incomingImageInfo.startingIndexSVZ = startingIndexSVZ_bodyIm;
-        incomingImageInfo.numPixSVX = numPixSVX_bodyIm;
-        incomingImageInfo.numPixSVY = numPixSVY_bodyIm;
-        incomingImageInfo.numPixSVZ = numPixSVZ_bodyIm;
-        incomingImageInfo.offsetBeforeImageContent = offsetBeforeImageContent;
 
+        int skipTheseBytes = (int)headerSize + (int)extHeaderSize_iMSG - 2;
+        for (int index = 0; index < bodyArrayLengths.Length; index++)
+        {
+            byte[] sectionByteArray = new byte[bodyArrayLengths[index]];
+            skipTheseBytes = skipTheseBytes + bodyArrayLengths[index];
+            Debug.Log("Skip these bytes: " + skipTheseBytes);
+            Buffer.BlockCopy(iMSGbyteArrayComplete, skipTheseBytes, sectionByteArray, 0, bodyArrayLengths[index]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(sectionByteArray);
+            }
+
+            switch (index)
+            {
+                case 0: 
+                    UInt16 versionNumber_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.versionNumber = versionNumber_bodyIm; break;
+                case 1:
+                    byte[] bodyArray_ImComp = sectionByteArray;
+                    incomingImageInfo.imComp = bodyArray_ImComp[0]; break;
+                case 2: 
+                    byte[] bodyArray_scalarType = sectionByteArray;
+                    incomingImageInfo.scalarType = bodyArray_scalarType[0]; break;
+                case 3:
+                    byte[] bodyArray_Endian = sectionByteArray;
+                    incomingImageInfo.endian = bodyArray_Endian[0]; break;
+                case 4:
+                    byte[] bodyArray_ImCoord = sectionByteArray;
+                    incomingImageInfo.imCoord = bodyArray_ImCoord[0]; break;
+                case 5:
+                    UInt16 numPixX_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.numPixX = numPixX_bodyIm; break;
+                case 6:
+                    UInt16 numPixY_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.numPixY = numPixY_bodyIm; break;
+                case 7:
+                    UInt16 numPixZ_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.numPixZ = numPixZ_bodyIm; break;
+                case 8:
+                    float xi_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.xi = xi_bodyIm; break;
+                case 9:
+                    float yi_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.yi = yi_bodyIm; break;
+                case 10:
+                    float zi_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.zi = zi_bodyIm; break;
+                case 11:
+                    float xj_bodyIm = BitConverter.ToUInt16(sectionByteArray);
+                    incomingImageInfo.xj = xj_bodyIm; break;
+                case 12:
+                    float yj_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.yj = yj_bodyIm; break;
+                case 13:
+                    float zj_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.zj = zj_bodyIm; break;
+                case 14:
+                    float xk_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.xk = xk_bodyIm; break;
+                case 15:
+                    float yk_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.yj = yk_bodyIm; break;
+                case 16:
+                    float zk_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.zj = zk_bodyIm; break;
+                case 17:
+                    float centerPosX_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.centerPosX = centerPosX_bodyIm; break;
+                case 18:
+                    float centerPosY_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.centerPosY = centerPosY_bodyIm; break;
+                case 19:
+                    float centerPosZ_bodyIm = BitConverter.ToSingle(sectionByteArray, 0);
+                    incomingImageInfo.centerPosZ = centerPosZ_bodyIm; break;
+                case 20:
+                    UInt16 startingIndexSVX_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.startingIndexSVX = startingIndexSVX_bodyIm; break;
+                case 21:
+                    UInt16 startingIndexSVY_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.startingIndexSVY = startingIndexSVY_bodyIm; break;
+                case 22:
+                    UInt16 startingIndexSVZ_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.startingIndexSVZ = startingIndexSVZ_bodyIm; break;
+                case 23:
+                    UInt16 numPixSVX_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.numPixSVX = numPixSVX_bodyIm; break;
+                case 24:
+                    UInt16 numPixSVY_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.numPixSVY = numPixSVY_bodyIm; break;
+                case 25:
+                    UInt16 numPixSVZ_bodyIm = BitConverter.ToUInt16(sectionByteArray, 0);
+                    incomingImageInfo.numPixSVZ = numPixSVZ_bodyIm; break;
+                default:
+                    break;
+                
+            }
+        }
+        
+        int offsetBeforeImageContent = skipTheseBytes;
+        incomingImageInfo.offsetBeforeImageContent = offsetBeforeImageContent;
+        
         return incomingImageInfo;
     }
 
