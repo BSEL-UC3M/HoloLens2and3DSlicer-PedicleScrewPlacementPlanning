@@ -86,23 +86,22 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		### INPUTS SECTION
 
 		self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.onInputVolumeUpdated)
-		# self.ui.inputVolumePath.connect("currentPathChanged(QString)", self.onInputVolumePathUpdated) # This does nothing atm
-		# self.ui.loadInputVolumeButton.connect("clicked(bool)", self.onLoadInputVolumeClicked)
+		self.ui.inputVolumePath.connect("currentPathChanged(QString)", self.onInputVolumePathUpdated)
+		self.ui.loadInputVolumeButton.connect("clicked(bool)", self.onLoadInputVolumeClicked)
 
 		self.ui.imageWWSpinBox.connect("valueChanged(double)", self.onWWSpinBoxChanged)
 		self.ui.imageHistogramSlideBar.connect("valuesChanged(double,double)", self.onImageHistogramSlideBarChanged)
 		self.ui.imageWLSpinBox.connect("valueChanged(double)", self.onWLSpinBoxChanged)
 		self.ui.createImageSliceButton.connect('clicked(bool)', self.onCreateImageSliceClicked)
 
-		self.ui.modelsPath.connect("textChanged(QString)", self.updateParameterNodeFromGUI)
+		self.ui.modelsPath.connect("currentPathChanged(QString)", self.onModelsPathUpdated)
 		self.ui.loadSpineModelButton.connect('clicked(bool)', self.onLoadSpineModelFromFileClicked)
-
 
         #### OpenIGTLink Connection SECTION
 		self.ui.serverActiveCheckBox.connect("toggled(bool)", self.onActivateOpenIGTLinkConnectionClicked)
 
 		### Update screws SECTION
-		# self.ui.screwDirButton.connect('clicked(bool)', self.onScrewDirButtonClicked)
+		self.ui.screwDirButton.connect('directorySelected(QString)', self.onScrewDirChanged)
 		self.ui.loadScrewModelsButton.connect('clicked(bool)', self.onLoadScrewModelsFromFileClicked)
 
 		### SAVE SECTION
@@ -122,6 +121,13 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		settings = slicer.app.userSettings()
 		if settings.value(self.logic.SAVING_DIRECTORY): # if the settings exists
 			self.ui.savingPath.directory = settings.value(self.logic.SAVING_DIRECTORY)
+		if settings.value(self.logic.INPUT_VOLUME_PATH):
+			self.ui.inputVolumePath.setCurrentPath(settings.value(self.logic.INPUT_VOLUME_PATH))
+		if settings.value(self.logic.MODELS_DIRECTORY):
+			self.ui.modelsPath.setCurrentPath(settings.value(self.logic.MODELS_DIRECTORY))
+		if settings.value(self.logic.SCREWS_DIRECTORY):
+			self.ui.screwDirButton.directory = settings.value(self.logic.SCREWS_DIRECTORY)
+
 
 	def cleanup(self):
 		"""
@@ -144,11 +150,11 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
 
 	def onSceneStartClose(self, caller, event):
-			"""
-			Called just before the scene is closed.
-			"""
-			# Parameter node will be reset, do not use it anymore
-			self.setParameterNode(None)
+		"""
+		Called just before the scene is closed.
+		"""
+		# Parameter node will be reset, do not use it anymore
+		self.setParameterNode(None)
 
 	def onSceneEndClose(self, caller, event):
 		"""
@@ -158,10 +164,59 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		if self.parent.isEntered:
 				self.initializeParameterNode()
 
+	#
+	# UI functions
+	#
+
+	def onInputVolumePathUpdated(self, path):
+		'''
+		Updates the input volume path in the settings
+		'''
+		settings = slicer.app.userSettings()
+		settings.setValue(self.logic.INPUT_VOLUME_PATH, path)
+		# enable the button	
+		self.ui.loadInputVolumeButton.enabled = True
+
+	def onLoadInputVolumeClicked(self):
+		'''
+		Loads the input volume from the path
+		'''
+		# Get the path from the GUI
+		path = self.ui.inputVolumePath.currentPath
+		# Get the volume name from the path
+		filename = os.path.splitext(os.path.basename(path))[0]
+		# Load the volume
+		volumeNode = slicer.util.loadVolume(path)
+		# Set the volume as the input volume
+		self.ui.inputSelector.setCurrentNode(volumeNode)
+		# disable the button
+		self.ui.loadInputVolumeButton.enabled = False
+
+	def onInputVolumeUpdated(self):
+		"""
+		This method is called when the input volume is changed.
+		It updates the range of the histogram slide bar, and the WW and WL spin boxes.
+		"""
+		self.updateParameterNodeFromGUI()
+		self.logic.updateHistLimitsFromInput()
+		# Update the slide bar limits
+		self.ui.imageHistogramSlideBar.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
+		self.ui.imageHistogramSlideBar.maximum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
+		# Set the maximum and minimum values for the WW and WL spin boxes
+		maxWidth = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
+		self.ui.imageWWSpinBox.minimum = 0.0
+		self.ui.imageWWSpinBox.maximum = maxWidth
+		minLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
+		maxLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
+		self.ui.imageWLSpinBox.maximum = maxLevel
+		self.ui.imageWLSpinBox.minimum = minLevel
+		# update the window level to be zero and the width to be half the maximum in the parameter node
+		self._parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(0))
+		self._parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(0.5*maxWidth))
 
 	def onWWSpinBoxChanged(self, value):
 		"""
-		Updates the WW value in the parameter node
+		Updates the Window Width value in the parameter node
 		"""
 		parameterNode = self.logic.getParameterNode()
 		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(value))
@@ -170,7 +225,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 	def onWLSpinBoxChanged(self, value):
 		"""
-		Updates the WL value in the parameter node
+		Updates the Window Level value in the parameter node
 		"""
 		parameterNode = self.logic.getParameterNode()
 		parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(value))
@@ -179,7 +234,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
 	def onImageHistogramSlideBarChanged(self):
 		"""
-		Updates the WW and WL values in the parameter node
+		Updates the Window Width and Window Level values in the parameter node
 		"""
 		parameterNode = self.logic.getParameterNode()
 		parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(self.ui.imageHistogramSlideBar.maximumValue - self.ui.imageHistogramSlideBar.minimumValue))
@@ -187,6 +242,105 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self.updateGUIFromParameterNode()
 		self.logic.UpdateImageValuesWithSlider()
 
+	def onCreateImageSliceClicked(self):
+		"""
+		Run processing when user clicks "Create Image Slide" button.
+		"""
+		self.updateParameterNodeFromGUI()
+		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
+			# Compute output
+			self.logic.CreateImageSlice()
+			# disable the button
+			self.ui.createImageSliceButton.enabled = False
+
+	def onModelsPathUpdated(self, path):
+		'''
+		Updates the models path in the settings
+		'''
+		settings = slicer.app.userSettings()
+		settings.setValue(self.logic.MODELS_DIRECTORY, path)
+		# enable the button	
+		self.ui.loadSpineModelButton.enabled = True
+
+	def onLoadSpineModelFromFileClicked(self):
+		"""
+		Run processing when user clicks "Load Models" button.
+		"""
+		self.updateParameterNodeFromGUI()
+		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
+			parameterNode = self.logic.getParameterNode()
+			# Load spine model and change its color
+			spineFileName = parameterNode.GetParameter(self.logic.SPINE_FILENAME)
+			print("Spine file name: " + spineFileName)
+			boneColor = np.array([241,214,145])/255
+			spineModel = self.logic.LoadModelFromFile(spineFileName, boneColor, True)
+			self._parameterNode.SetNodeReferenceID(self.logic.SPINE_MODEL, spineModel.GetID()) ## Update parameter node
+			
+			# Build transform tree       
+			spineTransformName = "Spine_T"
+			spineTransform = self.logic.ApplyTransformToObject(spineModel, spineTransformName)
+			self._parameterNode.SetNodeReferenceID(self.logic.SPINE_TRANSFORM, spineTransform.GetID()) ## Update parameter node
+
+			imageTransform = slicer.util.getFirstNodeByName("Image_T")
+			self.logic.ApplyTransformToObject(imageTransform, spineTransformName)
+
+			# set the spine model as the current model
+			self.ui.loadSpineModelButton.enabled = False
+
+	def onScrewDirChanged(self, path):
+		'''
+		Updates the screw models path in the settings
+		'''
+		settings = slicer.app.userSettings()
+		settings.setValue(self.logic.SCREWS_DIRECTORY, path)
+		
+
+	def onLoadScrewModelsFromFileClicked(self):
+		"""
+		Run processing when user clicks "Load screw models" button.
+		"""
+		self.updateParameterNodeFromGUI()
+		self.logic.LoadScrewModelsFromFile()
+
+	def onActivateOpenIGTLinkConnectionClicked(self, connect):
+		"""
+		Run processing when user clicks on the OpenIGTLink checkbox.
+		"""
+		self.updateParameterNodeFromGUI()
+		# Update connection 
+		if connect: # If the connection (checkbox) is enabled
+				port_tracker = 18944
+				status = self.logic.StartOIGTLConnection(port_tracker) # Start connection
+				if status == 1:
+						self.connect = False # set connect variable to false
+						self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - ACTIVE" # Update displaying text
+		else: # If the connection (checkbox) is enabled
+				self.logic.StopOIGTLConnection() # Stop connection
+				self.connect = True # set connect variable to true
+				self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - INACTIVE" # Update displaying text
+				
+	def onSaveDirectoryChanged(self, directory):
+		"""
+		Run processing when user selects a new saving location.
+		"""
+		# update settings with the new directory
+		settings = slicer.app.userSettings()
+		settings.setValue(self.logic.SAVING_DIRECTORY, directory)
+
+	def onSaveDataClicked(self):
+		"""
+		Run processing when user clicks "Save Data" button.
+		"""
+		self.updateParameterNodeFromGUI()
+		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
+
+				# Compute output
+				save_folder_path = self.logic.SaveData()
+				self.ui.filesSavedLabel.setText("All files have been saved in:\n" + save_folder_path)
+
+	#
+	# Parameter node and GUI interaction
+	# 			             
 	def initializeParameterNode(self):
 		"""
 		Ensure parameter node exists and observed.
@@ -254,16 +408,18 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# Update node selectors and sliders
 		self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference(self.logic.INPUT_VOLUME))
 		
-		# update the WW and WL spin boxes
-		WL = float(self._parameterNode.GetParameter(self.logic.WINDOW_LEVEL))
-		WW = float(self._parameterNode.GetParameter(self.logic.WINDOW_WIDTH))
-		self.ui.imageWWSpinBox.value = WW
-		self.ui.imageWLSpinBox.value = WL
-		# Update the histogram slide bar
-		minVAL = WL - WW/2
-		maxVAL = WL + WW/2
-		self.ui.imageHistogramSlideBar.minimumValue = minVAL
-		self.ui.imageHistogramSlideBar.maximumValue = maxVAL
+		# if the window level and width are set
+		if self._parameterNode.GetParameter(self.logic.WINDOW_LEVEL) and self._parameterNode.GetParameter(self.logic.WINDOW_WIDTH):
+			# update the WW and WL spin boxes
+			WL = float(self._parameterNode.GetParameter(self.logic.WINDOW_LEVEL))
+			WW = float(self._parameterNode.GetParameter(self.logic.WINDOW_WIDTH))
+			self.ui.imageWWSpinBox.value = WW
+			self.ui.imageWLSpinBox.value = WL
+			# Update the histogram slide bar
+			minVAL = WL - WW/2
+			maxVAL = WL + WW/2
+			self.ui.imageHistogramSlideBar.minimumValue = minVAL
+			self.ui.imageHistogramSlideBar.maximumValue = maxVAL
 
 		# Update buttons states and tooltips
 		if self._parameterNode.GetNodeReference("InputVolume"):
@@ -305,105 +461,7 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		
 		self._parameterNode.EndModify(wasModified)
 
-	def onInputVolumeUpdated(self):
-		"""
-			This method is called when the user changes the input volume
-		"""
-		self.updateParameterNodeFromGUI()
-		self.logic.UpdateImageLimits()
-		# Update the slide bar limits
-		self.ui.imageHistogramSlideBar.minimum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
-		self.ui.imageHistogramSlideBar.maximum = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
-		# Set the maximum and minimum values for the WW and WL spin boxes
-		maxWidth = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit)) - float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
-		self.ui.imageWWSpinBox.minimum = 0.0
-		self.ui.imageWWSpinBox.maximum = maxWidth
-		minLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_minLimit))
-		maxLevel = float(self._parameterNode.GetParameter(self.logic.IMAGE_HIST_SLIDEBAR_maxLimit))
-		self.ui.imageWLSpinBox.maximum = maxLevel
-		self.ui.imageWLSpinBox.minimum = minLevel
-		# update the window level to be zero and the width to be half the maximum in the parameter node
-		self._parameterNode.SetParameter(self.logic.WINDOW_LEVEL, str(0))
-		self._parameterNode.SetParameter(self.logic.WINDOW_WIDTH, str(0.5*maxWidth))
 
-	def onCreateImageSliceClicked(self):
-		"""
-		Run processing when user clicks "Create Image Slide" button.
-		"""
-		self.updateParameterNodeFromGUI()
-		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
-			# Compute output
-			self.logic.CreateImageSlice()
-
-			self.ui.InputImageCollapsibleButton.collapsed = True
-
-	def onLoadSpineModelFromFileClicked(self):
-		"""
-		Run processing when user clicks "Load Models" button.
-		"""
-		self.updateParameterNodeFromGUI()
-		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
-			parameterNode = self.logic.getParameterNode()
-			# Load spine model and change its color
-			spineFileName = parameterNode.GetParameter(self.logic.SPINE_FILENAME)
-			boneColor = np.array([241,214,145])/255
-			spineModel = self.logic.LoadModelFromFile(spineFileName, boneColor, True)
-			self._parameterNode.SetNodeReferenceID(self.logic.SPINE_MODEL, spineModel.GetID()) ## Update parameter node
-			
-			# Build transform tree        
-			spineTransformName = "Spine_T"
-			spineTransform = self.logic.ApplyTransformToObject(spineModel, spineTransformName)
-			self._parameterNode.SetNodeReferenceID(self.logic.SPINE_TRANSFORM, spineTransform.GetID()) ## Update parameter node
-
-			imageTransform = slicer.util.getFirstNodeByName("Image_T")
-			self.logic.ApplyTransformToObject(imageTransform, spineTransformName)
-
-			self.ui.loadSpineModelButton.enabled = False
-
-	def onLoadScrewModelsFromFileClicked(self):
-		"""
-		Run processing when user clicks "Load screw models" button.
-		"""
-		self.updateParameterNodeFromGUI()
-		self.logic.LoadScrewModelsFromFile()
-
-	def onActivateOpenIGTLinkConnectionClicked(self, connect):
-		"""
-		Run processing when user clicks on the OpenIGTLink checkbox.
-		"""
-		self.updateParameterNodeFromGUI()
-		# Update connection 
-		if connect: # If the connection (checkbox) is enabled
-				port_tracker = 18944
-				status = self.logic.StartOIGTLConnection(port_tracker) # Start connection
-				if status == 1:
-						self.connect = False # set connect variable to false
-						self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - ACTIVE" # Update displaying text
-		else: # If the connection (checkbox) is enabled
-				self.logic.StopOIGTLConnection() # Stop connection
-				self.connect = True # set connect variable to true
-				self.ui.OIGTLconnectionLabel.text = "OpenIGTLink server - INACTIVE" # Update displaying text
-				
-	def onSaveDirectoryChanged(self, directory):
-		"""
-		Run processing when user selects a new saving location.
-		"""
-		# update settings with the new directory
-		settings = slicer.app.userSettings()
-		settings.setValue(self.logic.SAVING_DIRECTORY, directory)
-		print("Saving directory changed to: " + directory)
-
-	def onSaveDataClicked(self):
-		"""
-		Run processing when user clicks "Save Data" button.
-		"""
-		self.updateParameterNodeFromGUI()
-		with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
-
-				# Compute output
-				save_folder_path = self.logic.SaveData()
-				self.ui.filesSavedLabel.setText("All files have been saved in:\n" + save_folder_path)
-			             
 #
 # AR_PlannerLogic
 #
@@ -412,6 +470,8 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 	# Image slide
 	INPUT_VOLUME = 'InputVolume'
+	INPUT_VOLUME_PATH = 'InputPath'
+
 	IMAGE_HIST_SLIDEBAR_minLimit = 'ImageHistogramSlideBar_minLimit'
 	IMAGE_HIST_SLIDEBAR_maxLimit = 'ImageHistogramSlideBar_maxLimit'
 	WINDOW_WIDTH = 'WindowWidth'
@@ -424,6 +484,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 	MODELS_DIRECTORY = 'ModelsDirectory'
 	SPINE_MODEL = 'SpineModel'
 	SPINE_FILENAME = 'SpineFileName'
+	SCREWS_DIRECTORY = 'ScrewsDirectory'
 
 	# Transforms
 	SPINE_TRANSFORM = 'Spine_T'
@@ -450,9 +511,9 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		if not parameterNode.GetParameter(self.ACTIVE_SERVER_CHECKBOX):
 				parameterNode.SetParameter(self.ACTIVE_SERVER_CHECKBOX, "0")
 
-	def UpdateImageLimits(self):
+	def updateHistLimitsFromInput(self):
 		"""
-		Update the image limits according to INPUT_VOLUME.
+		Update the min and max values of the histogram slide bar from the input volume.
 		"""
 		parameterNode = self.getParameterNode()
 		inputVolume = parameterNode.GetNodeReference(self.INPUT_VOLUME)
@@ -505,7 +566,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		self.CreateSlide()
 
-
 	def SetVolumeRangeTo_0_255(self):
 		"""
 		Set the volume range to [0-255].
@@ -552,7 +612,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		slicer.cli.run(resampleImageModule, node, parameters, True) # Execute it
 
 		slicer.mrmlScene.RemoveNode(slicer.util.getNode('Identity_T')) # We had to create an identity transform to run the process. Once we have finish, delete this transform from the scene
-
 
 	def CreateSlide(self):
 		"""
@@ -609,9 +668,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		reslice.GetOutput().SetSpacing(1,1,1)  # Spacing will be set on MRML node to let Slicer know
 
 		# To allow re-run of this script, try to reuse exisiting node before creating a new one
-
-		# outputNodeName = "CT_reslice"
-		# outputNode = slicer.mrmlScene.GetFirstNodeByName(outputNodeName) # ** This is not something to change now, but getting nodes by name is not robust!
 		# Get the output node by ID instead
 		outputNode = parameterNode.GetNodeReference(self.CT_RESLICE_OUTPUT)
 		if outputNode is None:
@@ -671,7 +727,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		observerTag = sliceToRasNode.AddObserver(slicer.vtkMRMLTransformNode.TransformModifiedEvent, UpdateReslice)
 
-
 	def LoadModelFromFile(self, modelFileName, colorRGB_array, visibility_bool):
 		"""
 		Load the model "modelFileName" from the specified folder. Set its color to colorRGB_array and enable its visibility according to visibility_bool
@@ -724,9 +779,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 					self.ApplyTransformToObject(newScrew, transformName) # Apply the transform to the model
 					self.ApplyTransformToObject(tNode, "Spine_T") 
 			
-				
-
-
 	def GetOrCreateTransform(self, transformName):
 		"""
 		Gets existing tranform or create new transform containing the identity matrix.
@@ -739,7 +791,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 				slicer.mrmlScene.AddNode(node)
 				#print ('ERROR: ' + transformName + ' transform was not found. Creating node as identity...')
 		return node
-
 
 	def ApplyTransformToObject(self, object, transformName):
 		"""
@@ -755,7 +806,6 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		return transform
 
-	
 	def StartOIGTLConnection(self, port_tracker):
 		"""
 		Starts OIGTL connection.

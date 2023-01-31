@@ -76,6 +76,9 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="ctkPushButton" name="loadInputVolumeButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Load volume</string>
            </property>
@@ -180,33 +183,6 @@ p, li { white-space: pre-wrap; }
       <item row="15" column="1">
        <widget class="QWidget" name="horizontalWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="qMRMLNodeComboBox" name="spineModelSelector">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="toolTip">
-            <string>Select spine model</string>
-           </property>
-           <property name="nodeTypes">
-            <stringlist>
-             <string>vtkMRMLModelNode</string>
-            </stringlist>
-           </property>
-           <property name="showChildNodeTypes">
-            <bool>false</bool>
-           </property>
-           <property name="noneEnabled">
-            <bool>true</bool>
-           </property>
-           <property name="addEnabled">
-            <bool>false</bool>
-           </property>
-           <property name="removeEnabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="ctkPathLineEdit" name="modelsPath"/>
          </item>
@@ -504,22 +480,6 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>224</x>
      <y>124</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ARforSpinalScrews</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>spineModelSelector</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>385</x>
-     <y>1107</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>337</x>
-     <y>295</y>
     </hint>
    </hints>
   </connection>
