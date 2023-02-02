@@ -146,7 +146,6 @@ public class ReadMessageFromServer
         {
             byte[] sectionByteArray = new byte[bodyArrayLengths[index]];
             skipTheseBytes = skipTheseBytes + bodyArrayLengths[index];
-            Debug.Log("Skip these bytes: " + skipTheseBytes);
             Buffer.BlockCopy(iMSGbyteArrayComplete, skipTheseBytes, sectionByteArray, 0, bodyArrayLengths[index]);
             if (BitConverter.IsLittleEndian)
             {

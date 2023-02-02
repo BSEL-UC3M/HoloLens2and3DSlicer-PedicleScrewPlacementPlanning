@@ -80,7 +80,7 @@ MonoBehaviour:
       description: None
       axisConstraint: 0
   - localizationKey: 
-    keyword: Connect
+    keyword: Connect to slicer
     keyCode: 0
     action:
       id: 0
@@ -102,6 +102,13 @@ MonoBehaviour:
       axisConstraint: 0
   - localizationKey: 
     keyword: Fix image
+    keyCode: 0
+    action:
+      id: 0
+      description: None
+      axisConstraint: 0
+  - localizationKey: 
+    keyword: Show spine
     keyCode: 0
     action:
       id: 0

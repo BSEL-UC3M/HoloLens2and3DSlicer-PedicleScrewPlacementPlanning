@@ -6253,7 +6253,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1676094738400274201, guid: a873c95c462c4f1468bff3b162b283e7, type: 3}
       propertyPath: voiceCommand
-      value: 
+      value: Connect to slicer
       objectReference: {fileID: 0}
     - target: {fileID: 1676094738400274201, guid: a873c95c462c4f1468bff3b162b283e7, type: 3}
       propertyPath: voiceRequiresFocus
@@ -6287,7 +6287,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2883588981209468447, guid: cc00632b0be680849b682e403fa1b2d7, type: 3}
       propertyPath: voiceCommand
-      value: 
+      value: Show spine
       objectReference: {fileID: 0}
     - target: {fileID: 2883588981209468447, guid: cc00632b0be680849b682e403fa1b2d7, type: 3}
       propertyPath: startDimensionIndex
