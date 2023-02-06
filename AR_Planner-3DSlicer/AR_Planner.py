@@ -271,9 +271,9 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 			parameterNode = self.logic.getParameterNode()
 			# Load spine model and change its color
 			spineFileName = parameterNode.GetParameter(self.logic.SPINE_FILENAME)
-			print("Spine file name: " + spineFileName)
+			spinePath = parameterNode.GetParameter(self.logic.MODELS_DIRECTORY) # Get path to screw models
 			boneColor = np.array([241,214,145])/255
-			spineModel = self.logic.LoadModelFromFile(spineFileName, boneColor, True)
+			spineModel = self.logic.LoadModelFromFile(spinePath, spineFileName, boneColor, True)
 			self._parameterNode.SetNodeReferenceID(self.logic.SPINE_MODEL, spineModel.GetID()) ## Update parameter node
 			
 			# Build transform tree       
@@ -455,9 +455,11 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		self._parameterNode.SetParameter(self.logic.ACTIVE_SERVER_CHECKBOX, "true" if self.ui.serverActiveCheckBox.checked else "false")
 		self._parameterNode.SetParameter(self.logic.PATIENT_ID, (self.ui.patientID_text).text)
 		self._parameterNode.SetParameter(self.logic.USER_ID, (self.ui.userID_text).text)
-		(dirname, spineFileName) = os.path.split(self.ui.modelsPath.currentPath)
-		self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, dirname)
+		(spineDirName, spineFileName) = os.path.split(self.ui.modelsPath.currentPath)
+		self._parameterNode.SetParameter(self.logic.MODELS_DIRECTORY, spineDirName)
 		self._parameterNode.SetParameter(self.logic.SPINE_FILENAME, spineFileName)
+		self._parameterNode.SetParameter(self.logic.SCREWS_DIRECTORY, self.ui.screwDirButton.directory)
+		
 		
 		self._parameterNode.EndModify(wasModified)
 
@@ -727,12 +729,12 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		observerTag = sliceToRasNode.AddObserver(slicer.vtkMRMLTransformNode.TransformModifiedEvent, UpdateReslice)
 
-	def LoadModelFromFile(self, modelFileName, colorRGB_array, visibility_bool):
+	def LoadModelFromFile(self, modelFilePath, modelFileName, colorRGB_array, visibility_bool):
 		"""
 		Load the model "modelFileName" from the specified folder. Set its color to colorRGB_array and enable its visibility according to visibility_bool
 		"""
-		parameterNode = self.getParameterNode()
-		modelFilePath = parameterNode.GetParameter(self.MODELS_DIRECTORY)
+		#parameterNode = self.getParameterNode()
+		#modelFilePath = parameterNode.GetParameter(self.MODELS_DIRECTORY)
 		try:
 				node = slicer.util.getNode(modelFileName)
 		except:
@@ -748,6 +750,9 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 		"""
 			First, delete preexisting screw models in the scene. Second, parse the screw transforms received from Unity and load the corresponding screw models from the specified folder
 		"""
+		parameterNode = self.getParameterNode()
+		screwPath = parameterNode.GetParameter(self.SCREWS_DIRECTORY) # Get path to screw models
+
 		modelNodes = slicer.util.getNodesByClass("vtkMRMLModelNode")
 		for modelNode in modelNodes: # Everytime we click on the "Load screw models" button, we delete all screws in the scene. Then we create the new ones.
 			if ("Screw" in modelNode.GetName()):
@@ -774,7 +779,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 					fileName = tNode.GetAttribute("OpenIGTLink.ModelName") # Get the model name
 					modelColor = tNode.GetAttribute("OpenIGTLink.ModelColor") # Get the model color from the metadata of the transform message
 					colorArray = np.asarray(modelColor.split(","), dtype=float) # Parse the color numbers as floats
-					newScrew = self.LoadModelFromFile(fileName, colorArray, True) # Load the corresponding model from file and assign to it its corresponding color
+					newScrew = self.LoadModelFromFile(screwPath, fileName, colorArray, True) # Load the corresponding model from file and assign to it its corresponding color
 					newScrew.SetName(screwName) # Rename the model with the format Screw-1, Screw-2, etc.
 					self.ApplyTransformToObject(newScrew, transformName) # Apply the transform to the model
 					self.ApplyTransformToObject(tNode, "Spine_T") 
@@ -802,7 +807,7 @@ class AR_PlannerLogic(ScriptedLoadableModuleLogic, VTKObservationMixin):
 
 		object.SetAndObserveTransformNodeID(transform.GetID())
 		
-		print ('Transform ' + transformName + ' applied to ' + object.GetName())
+		#print ('Transform ' + transformName + ' applied to ' + object.GetName())
 
 		return transform
 
