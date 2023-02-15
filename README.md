@@ -32,8 +32,8 @@ For more information, read the README.md file within each folder.
 ## General information
  - 3D Slicer version used: 3D Slicer 5.0.3
    + NOTE: Before proceeding with these modules, please install extensions [SlicerIGT](https://github.com/SlicerIGT/SlicerIGT) and [OpenIGTLink](https://github.com/openigtlink/OpenIGTLink) from the Extensions Manager in 3D Slicer.
- - Unity version used: 2019.3.9f1
-   + NOTE: Some of the libraries and dependencies used in this Unity project may be deprecated / non-existent in other Unity versions. Please, only use version 2019.3.9f1 to run this project.
+ - Unity version used: 2021.3.9f1
+   + NOTE: Some of the libraries and dependencies used in this Unity project may be deprecated / non-existent in other Unity versions. Please, only use version 2021.3.9f1 to run this project.
  - For further questions, please contact apose@ing.uc3m.es
 
 ## Citation
