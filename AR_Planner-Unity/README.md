@@ -3,7 +3,7 @@
  1. Download this project and open it in Unity (version 2021.3.9f1).
  2. Set up the project configuration with MRTK following the steps in [this tutorial](https://learn.microsoft.com/es-es/training/modules/learn-mrtk-tutorials/1-5-exercise-configure-resources?tabs=openxr).
  3. Open the scene *PedicleScrews*.
- 4. In the Hierarchy, click on *OpenIGTLinkConnectHandler* to find the *OpenIGTLinkConnect* script. Specify the IP string and port of your OpenIGTLink server from 3D Slicer. If 3D Slicer is running on the same computer as Unity, you can write *localhost*.
+ 4. In the Hierarchy, click on *OpenIGTLinkConnectHandler* to find the *OpenIGTLinkConnect* script. Specify the IP string and port of your OpenIGTLink server from 3D Slicer. When 3D Slicer is running on the same computer as Unity, you can write *localhost*.
  5. In the Hierarchy, click on *Models* to find the *PressableButtons* script. Specify the Patient Number.
  6. In the top menu, click on *Mixed Reality > Remoting > Holographic Remoting for Play Mode* to enable the [Holographic Remoting connection](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/native/holographic-remoting-player).
  7. Find your Microsoft HoloLens 2 IP address within the Holographic Remoting Player app and write it in the *Remote Host Name* section.
@@ -35,10 +35,10 @@ Models are currently loaded from the "PressableButtons.cs" script. You can find 
 On the Start() function you define the route to your models (for instance, the path towards the Spine prefab is defined in line 66 as spineModelPath). Then, you load the model using the functions Resources.Load() and GameObject.Instantiate(). 
 You could load your own models on Start by copying and pasting this same code as often as you want with the name of your prefabs (lines 64-71).
 To create your prefabs follow:
-     1. Load any OBJ file into a "Models" folder in your assets folder (Unity can't interpret STL files).
-     2. Manually drag and drop it to your Hierarchy window to instantiate them in the scene. If you are importing a model from 3D Slicer you may have to scale it by 0.001 to convert the default units from Slicer (millimeters) to the default units in Unity (meters)
-     3. Attach to them the following scripts: a collider, "NearInteractionGrabbable", "Object Manipulator (Script)", "Constraint Manager (Script)" and "Model Info (Script)". 
-     4. Drag and drop back your GameObject into a "Prefabs" folder
+1.  Load any OBJ file into a "Models" folder in your assets folder (Unity can't interpret STL files).
+2.  Manually drag and drop it to your Hierarchy window to instantiate them in the scene. If you are importing a model from 3D Slicer you may have to scale it by 0.001 to  convert the default units from Slicer (millimeters) to the default units in Unity (meters)
+3.  Attach to them the following scripts: a collider, "NearInteractionGrabbable", "Object Manipulator (Script)", "Constraint Manager (Script)" and "Model Info (Script)". 
+4.  Drag and drop back your GameObject into a "Prefabs" folder
 With this, you define a prefab that can be easily loaded following the instructions above and that will be manipulable with your hand so that you can translate and rotate it in the 3D world. Thanks to the Model Info script, you can also send its information to 3D Slicer using the protocol defined in this work.
 
 
