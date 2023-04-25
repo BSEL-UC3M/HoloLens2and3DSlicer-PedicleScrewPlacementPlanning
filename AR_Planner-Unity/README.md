@@ -30,4 +30,15 @@ The application starts with the 3D model of the spine corresponding to the patie
 - ControlPanel: It is the user interface to manipulate the 3D models from the AR glasses. It contains the *SwitchButtons* script that controls the functions of the switch buttons of the panel. The pressable buttons' functions are controlled with the *PressableButtons* script within *Models*.
 - Canvas: These are 3 buttons to reset the scene, save it and load it back. These buttons are not visible from the AR device. They can just be accessed from the Unity Editor.
 
+## Load your own models
+Models are currently loaded from the "PressableButtons.cs" script. You can find it in "Assets > Scripts > ControlPanel > PressableButtons.cs".
+On the Start() function you define the route to your models (for instance, the path towards the Spine prefab is defined in line 66 as spineModelPath). Then, you load the model using the functions Resources.Load() and GameObject.Instantiate(). 
+You could load your own models on Start by copying and pasting this same code as often as you want with the name of your prefabs (lines 64-71).
+To create your prefabs follow:
+     1. Load any OBJ file into a "Models" folder in your assets folder (Unity can't interpret STL files).
+     2. Manually drag and drop it to your Hierarchy window to instantiate them in the scene. If you are importing a model from 3D Slicer you may have to scale it by 0.001 to convert the default units from Slicer (millimeters) to the default units in Unity (meters)
+     3. Attach to them the following scripts: a collider, "NearInteractionGrabbable", "Object Manipulator (Script)", "Constraint Manager (Script)" and "Model Info (Script)". 
+     4. Drag and drop back your GameObject into a "Prefabs" folder
+With this, you define a prefab that can be easily loaded following the instructions above and that will be manipulable with your hand so that you can translate and rotate it in the 3D world. Thanks to the Model Info script, you can also send its information to 3D Slicer using the protocol defined in this work.
+
 
