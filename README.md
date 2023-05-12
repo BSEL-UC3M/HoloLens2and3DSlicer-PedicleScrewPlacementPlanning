@@ -1,4 +1,4 @@
-# Real-Time open-source integration between Microsoft HoloLens 2 and 3D Slicer
+# Real-Time integration between Microsoft HoloLens 2 and 3D Slicer
 ## with demonstration in pedicle screw placement planning
 
 This repository has been created by Alicia Pose Díez de la Lastra, from Universidad Carlos III de Madrid. It presents a novel approach to communicate Microsoft HoloLens 2 and 3D Slicer using OpenIGTLink. This connection is applied towards pedicle screw placement planning. Here is a [video demonstration](https://youtu.be/H4CQcr2erjc) of the functioning of the application. 
