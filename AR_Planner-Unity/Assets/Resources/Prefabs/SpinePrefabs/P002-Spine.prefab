@@ -69,6 +69,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 9659c74c37546664cb9f3866c73a6d87, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 39d616b09f2f13146b1b1f6e3ed79b3d, type: 3}
+--- !u!4 &8089624373452093725 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 39d616b09f2f13146b1b1f6e3ed79b3d, type: 3}
+  m_PrefabInstance: {fileID: 8633022239564455670}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8867532885381637031 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 39d616b09f2f13146b1b1f6e3ed79b3d, type: 3}
@@ -87,7 +92,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.119861454, y: 0.13213359, z: 0.29110044}
   m_Center: {x: 0.00048066117, y: -0.08295604, z: 0.33198795}
---- !u!114 &4865437892386547905
+--- !u!114 &2642037710597105497
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -96,15 +101,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8867532885381637031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b38dcbf564b851d4db475b8c83019b36, type: 3}
+  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _name: Spine
-  _number: 0
-  _color: 2
-  _diameter: 2
-  _length: 2
-  _gameObject: {fileID: 8867532885381637031}
+  ShowTetherWhenManipulating: 0
+  IsBoundsHandles: 0
 --- !u!114 &2642037710597105502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -117,7 +118,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 181cd563a8349c34ea8978b0bc8d9c7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostTransform: {fileID: 0}
+  hostTransform: {fileID: 8089624373452093725}
   manipulationType: 3
   twoHandedManipulationType: 7
   allowFarManipulation: 1
@@ -134,7 +135,7 @@ MonoBehaviour:
   rotateLerpTime: 0.001
   scaleLerpTime: 0.001
   enableConstraints: 1
-  constraintsManager: {fileID: 0}
+  constraintsManager: {fileID: 2642037710597105503}
   elasticsManager: {fileID: 0}
   onManipulationStarted:
     m_PersistentCalls:
@@ -162,7 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   autoConstraintSelection: 1
   selectedConstraints: []
---- !u!114 &2642037710597105497
+--- !u!114 &4865437892386547905
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -171,8 +172,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 8867532885381637031}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5afd5316c63705643b3daba5a6e923bd, type: 3}
+  m_Script: {fileID: 11500000, guid: b38dcbf564b851d4db475b8c83019b36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTetherWhenManipulating: 0
-  IsBoundsHandles: 0
+  _name: Spine
+  _number: 0
+  _color: 2
+  _diameter: 2
+  _length: 2
+  _gameObject: {fileID: 8867532885381637031}

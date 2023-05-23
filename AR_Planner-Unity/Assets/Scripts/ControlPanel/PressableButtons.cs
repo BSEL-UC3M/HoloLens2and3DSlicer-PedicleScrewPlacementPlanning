@@ -158,7 +158,7 @@ public class PressableButtons : MonoBehaviour
         } 
         catch{}    
         // Create the new screw
-        ModelInfo screwMI = CreateScrew(numberOfScrews + 1, modelsParentTransform, spineModel, localPosition, localRotation);
+        ModelInfo screwMI = CreateScrew(numberOfScrews + 1, spineModel.transform, spineModel, localPosition, localRotation);
         // Highlight the new screw to mark it as "selected"
         screwSelected = screwMI._number;
         screwSelected_label.text =  "Screw " + screwMI._number + ":\nD" + screwMI._diameter + "L" + screwMI._length;
@@ -330,7 +330,7 @@ public class PressableButtons : MonoBehaviour
         if (modifiable)
         {
             screwMat = screwMobile_mat;
-            myGO.transform.SetParent(modelsParentTransform);
+            myGO.transform.SetParent(spineModel.transform);
         }
         else
         {
@@ -487,7 +487,7 @@ public class PressableButtons : MonoBehaviour
             // Find next diameter
             NextDiameter();
             // Create new screw with new diameter
-            ModelInfo newScrew = CreateScrew(screwSelected, modelsParentTransform, spineModel, localPosition, localRotation);
+            ModelInfo newScrew = CreateScrew(screwSelected, spineModel.transform, spineModel, localPosition, localRotation);
             // Make the new screw also modifiable
             ModifyScrew(newScrew._gameObject, modifiable);
             // Update emission mark
@@ -534,7 +534,7 @@ public class PressableButtons : MonoBehaviour
             // Find next length
             NextLength();
             // Create new screw with new length
-            ModelInfo newScrew = CreateScrew(screwSelected, modelsParentTransform, spineModel, localPosition, localRotation);
+            ModelInfo newScrew = CreateScrew(screwSelected, spineModel.transform, spineModel, localPosition, localRotation);
             // Make the new screw also modifiable
             ModifyScrew(newScrew._gameObject, modifiable);
             // Update emission mark
