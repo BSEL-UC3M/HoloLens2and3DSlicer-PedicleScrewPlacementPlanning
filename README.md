@@ -39,7 +39,15 @@ For more information, read the README.md file within each folder.
  - For further questions, please contact apose@ing.uc3m.es
 
 ## Citation
-This repository will complement a paper that is currently under revision for publication. When it's accepted, the corresponding citation will be updated here. If you find this useful, we kindly ask that you return to this page to check for the updated citation and cite our work in any related publications.
+This repository complements the paper: 
+
+- Title: **Real-time integration between Microsoft HoloLens 2 and 3D Slicer with demonstration in pedicle screw placement planning**
+- Authors: **Alicia Pose-Díez-de-la-Lastra, Tamas Ungi, David Morton, Gabor Fichtinger, and Javier Pascau.**
+- Published at: **International Journal of Computer-Assisted Radiology and Surgery (IJCARS)**
+- Date of publication: June 2023
+- Reference: https://doi.org/10.1007/s11548-023-02977-0
+
+If you find it useful, please consider citing us.
 
 
 ## Aknowledgements
