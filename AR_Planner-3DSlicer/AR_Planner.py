@@ -142,13 +142,6 @@ class AR_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 		# Make sure parameter node exists and observed
 		self.initializeParameterNode()
 
-	def exit(self):
-		"""
-		Called each time the user opens a different module.
-		"""
-		# Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
-		self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
-
 	def onSceneStartClose(self, caller, event):
 		"""
 		Called just before the scene is closed.

@@ -135,8 +135,8 @@ public class PressableButtons : MonoBehaviour
 
         ///// Initialize CANVASBUTTONS script
         GameObject canvasButtonsScriptHolder = GameObject.Find("Canvas");
-        canvasButtonsScriptHolder.GetComponent<CanvasButtons>().spineGO = spineModel;
-        canvasButtonsScriptHolder.GetComponent<CanvasButtons>().screwFixed_mat = screwFixed_mat;
+        //canvasButtonsScriptHolder.GetComponent<CanvasButtons>().spineGO = spineModel;
+        //canvasButtonsScriptHolder.GetComponent<CanvasButtons>().screwFixed_mat = screwFixed_mat;
 
     }
 

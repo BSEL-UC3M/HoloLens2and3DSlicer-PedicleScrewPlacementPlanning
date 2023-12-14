@@ -361,7 +361,7 @@ class Desktop_PlannerWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     Loads the spine model from the path
     '''
     # Get the path from the GUI
-    path = self.ui.spineModelPath.currentPath
+    path = self.ui.QRCodeModel_InputSelector.currentPath
     # Load the volume
     modelNode = slicer.util.loadModel(path)
     # Set the volume as the input volume

@@ -657,6 +657,22 @@ p, li { white-space: pre-wrap; }
   <connection>
    <sender>SpineGuidanceStudyModule</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>spineModelSelector</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>266</x>
+     <y>435</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>257</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SpineGuidanceStudyModule</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
@@ -682,23 +698,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>522</x>
-     <y>279</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SpineGuidanceStudyModule</sender>
-   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>spineModelSelector</receiver>
-   <slot>setMRMLScene(vtkMRMLScene*)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>266</x>
-     <y>435</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>257</x>
-     <y>119</y>
+     <y>311</y>
     </hint>
    </hints>
   </connection>
